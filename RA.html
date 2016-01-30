@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Graph</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="graph.css">
+        <script src="jquery-1.11.3.js"></script>
+        <script src="ocanvas-2.7.4.js"></script>
+    </head>
+    <body>
+        <canvas id="overall"></canvas>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var window_size = {width : $(window).width(), height: $(window).height()};
+                var canvas_size = {width: window_size.width * 0.6, height: window_size.height};
+                $('#overall').attr("width", canvas_size.width);
+                $('#overall').attr("height", canvas_size.height);
+                
+                var loops_size = {width: canvas_size.width, height: canvas_size.height * 0.5};
+                                
+                var canvas = oCanvas.create({
+                    canvas: "#overall",
+                    background: "#000",
+                    fps: 240
+                });
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////              Definition                   //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //real origin point for each section
+                var origins = [{X: 0, Y: 0}, 
+                    {X: 0, Y: loops_size.height}, 
+                    {X: 0, Y: 0}, 
+                    {X: 0, Y: 0}];
+                // real width and height of each section
+                var dimension = {width: loops_size.width, 
+                    height: loops_size.height}; 
+                // width and height for each section
+                var virtual_dimensions = [{width: 200, height: 50}, 
+                    {width: 100, height: 25}, 
+                    {width: 200, height: 175}, 
+                    {width: 100, height: 25}];
+                var steps = [{X: 50, Y: 10}, 
+                    {X: 20, Y: 5}, 
+                    {X: 50, Y: 25}, 
+                    {X: 20, Y: 5}];
+                var captions = ['RV', 'RA', 'LV', 'LA'];
+                
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////           Graph Data Definition           //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                var RA_upper_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":10,"Y":0.147323042},{"IsEmpty":false,"X":15,"Y":0.343973726},{"IsEmpty":false,"X":20,"Y":0.6064682},{"IsEmpty":false,"X":25,"Y":0.9568528},{"IsEmpty":false,"X":30,"Y":1.4245553},{"IsEmpty":false,"X":35,"Y":2.048857},{"IsEmpty":false,"X":40,"Y":2.88219118},{"IsEmpty":false,"X":45,"Y":3.99454784},{"IsEmpty":false,"X":50,"Y":5.47935057},{"IsEmpty":false,"X":55,"Y":7.46130466},{"IsEmpty":false,"X":60,"Y":10.1068687},{"IsEmpty":false,"X":65,"Y":13.638237},{"IsEmpty":false,"X":70,"Y":18.3520012},{"IsEmpty":false,"X":75,"Y":24.6440563},{"IsEmpty":false,"X":80,"Y":33.04286},{"IsEmpty":false,"X":85,"Y":44.2538},{"IsEmpty":false,"X":90,"Y":59.21846},{"IsEmpty":false,"X":95,"Y":79.19369},{"IsEmpty":false,"X":100,"Y":105.85714},{"IsEmpty":false,"X":105,"Y":141.448212},{"IsEmpty":false,"X":110,"Y":188.956131},{"IsEmpty":false,"X":115,"Y":252.370926},{"IsEmpty":false,"X":120,"Y":337.018677},{"IsEmpty":false,"X":125,"Y":450.008728}]';
+                var RA_bottom_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":1051.36658,"Y":500}]';
+                var RA_middle_json = '[{"IsEmpty":false,"X":35.1875954,"Y":12.485673},{"IsEmpty":false,"X":35.53347,"Y":11.99584},{"IsEmpty":false,"X":36.0104027,"Y":11.5106869},{"IsEmpty":false,"X":36.6126747,"Y":11.0307026},{"IsEmpty":false,"X":37.3346024,"Y":10.557744},{"IsEmpty":false,"X":38.1699753,"Y":10.0952864},{"IsEmpty":false,"X":39.15633,"Y":9.285107},{"IsEmpty":false,"X":40.40817,"Y":8.41873},{"IsEmpty":false,"X":41.8225,"Y":7.869803},{"IsEmpty":false,"X":43.3064,"Y":7.56552362},{"IsEmpty":false,"X":44.7908669,"Y":7.453822},{"IsEmpty":false,"X":46.22512,"Y":7.490946},{"IsEmpty":false,"X":47.5758247,"Y":7.63113928},{"IsEmpty":false,"X":48.82275,"Y":7.84461641},{"IsEmpty":false,"X":49.9551964,"Y":8.106119},{"IsEmpty":false,"X":50.97019,"Y":8.394502},{"IsEmpty":false,"X":51.8708076,"Y":8.692692},{"IsEmpty":false,"X":52.6645432,"Y":8.987616},{"IsEmpty":false,"X":53.36186,"Y":9.26997948},{"IsEmpty":false,"X":53.9748726,"Y":9.533894},{"IsEmpty":false,"X":54.51629,"Y":9.776374},{"IsEmpty":false,"X":54.9985161,"Y":9.996758},{"IsEmpty":false,"X":55.43306,"Y":10.1961126},{"IsEmpty":false,"X":55.8301048,"Y":10.3766632},{"IsEmpty":false,"X":56.1982956,"Y":10.541297},{"IsEmpty":false,"X":56.5446663,"Y":10.6931458},{"IsEmpty":false,"X":56.87471,"Y":10.8352709},{"IsEmpty":false,"X":57.1924934,"Y":10.9704351},{"IsEmpty":false,"X":57.5008736,"Y":11.1009665},{"IsEmpty":false,"X":57.80169,"Y":11.228694},{"IsEmpty":false,"X":58.09598,"Y":11.3549414},{"IsEmpty":false,"X":58.38421,"Y":11.4805622},{"IsEmpty":false,"X":58.66641,"Y":11.6059971},{"IsEmpty":false,"X":58.94236,"Y":11.7313585},{"IsEmpty":false,"X":59.2116928,"Y":11.8565006},{"IsEmpty":false,"X":59.4739838,"Y":11.9810991},{"IsEmpty":false,"X":59.72883,"Y":12.10472},{"IsEmpty":false,"X":59.9758644,"Y":12.2268677},{"IsEmpty":false,"X":60.2148132,"Y":12.3470335},{"IsEmpty":false,"X":60.44548,"Y":12.4647255},{"IsEmpty":false,"X":60.6677742,"Y":12.5794868},{"IsEmpty":false,"X":60.88168,"Y":12.6909122},{"IsEmpty":false,"X":61.08727,"Y":12.7986526},{"IsEmpty":false,"X":61.28468,"Y":12.9024153},{"IsEmpty":false,"X":61.4741173,"Y":13.0019627},{"IsEmpty":false,"X":61.6559334,"Y":13.0961132},{"IsEmpty":false,"X":61.8314247,"Y":13.1817064},{"IsEmpty":false,"X":62.0020332,"Y":13.2595043},{"IsEmpty":false,"X":62.1688423,"Y":13.3304367},{"IsEmpty":false,"X":62.3326263,"Y":13.3952827},{"IsEmpty":false,"X":62.49395,"Y":13.4547091},{"IsEmpty":false,"X":62.65321,"Y":13.509305},{"IsEmpty":false,"X":62.8106728,"Y":13.5596075},{"IsEmpty":false,"X":62.9665222,"Y":13.6061077},{"IsEmpty":false,"X":63.1208344,"Y":13.6492634},{"IsEmpty":false,"X":63.273632,"Y":13.6894989},{"IsEmpty":false,"X":63.42487,"Y":13.72721},{"IsEmpty":false,"X":63.57444,"Y":13.762763},{"IsEmpty":false,"X":63.7222,"Y":13.7964964},{"IsEmpty":false,"X":63.86795,"Y":13.8287239},{"IsEmpty":false,"X":64.0114746,"Y":13.8597288},{"IsEmpty":false,"X":64.1557541,"Y":13.8750982},{"IsEmpty":false,"X":64.29964,"Y":13.9007607},{"IsEmpty":false,"X":64.4398956,"Y":13.9331255},{"IsEmpty":false,"X":64.5744858,"Y":13.969574},{"IsEmpty":false,"X":64.70217,"Y":14.0082188},{"IsEmpty":false,"X":64.82231,"Y":14.0477123},{"IsEmpty":false,"X":64.9346848,"Y":14.0871153},{"IsEmpty":false,"X":65.03932,"Y":14.1257811},{"IsEmpty":false,"X":65.1364441,"Y":14.1632814},{"IsEmpty":false,"X":65.22639,"Y":14.1993465},{"IsEmpty":false,"X":65.30954,"Y":14.2338161},{"IsEmpty":false,"X":65.38634,"Y":14.266613},{"IsEmpty":false,"X":65.45722,"Y":14.2977142},{"IsEmpty":false,"X":64.97672,"Y":14.0313654},{"IsEmpty":false,"X":64.07393,"Y":13.2961836},{"IsEmpty":false,"X":63.21457,"Y":12.6201448},{"IsEmpty":false,"X":62.4067039,"Y":12.0152836},{"IsEmpty":false,"X":61.6438675,"Y":11.4703217},{"IsEmpty":false,"X":60.92093,"Y":10.9761677},{"IsEmpty":false,"X":60.2343445,"Y":10.5259914},{"IsEmpty":false,"X":59.58185,"Y":10.1146469},{"IsEmpty":false,"X":58.9622154,"Y":9.738237},{"IsEmpty":false,"X":58.37503,"Y":9.393786},{"IsEmpty":false,"X":57.8204956,"Y":9.078995},{"IsEmpty":false,"X":57.2992821,"Y":8.792062},{"IsEmpty":false,"X":56.8123627,"Y":8.531543},{"IsEmpty":false,"X":56.36088,"Y":8.296249},{"IsEmpty":false,"X":55.9460449,"Y":8.085165},{"IsEmpty":false,"X":55.56899,"Y":7.89738464},{"IsEmpty":false,"X":55.2306938,"Y":7.732066},{"IsEmpty":false,"X":54.9319077,"Y":7.588398},{"IsEmpty":false,"X":54.6730537,"Y":7.46557},{"IsEmpty":false,"X":54.4542,"Y":7.3627553},{"IsEmpty":false,"X":54.2750168,"Y":7.27910137},{"IsEmpty":false,"X":54.13477,"Y":7.21371937},{"IsEmpty":false,"X":54.0323257,"Y":7.165685},{"IsEmpty":false,"X":53.96619,"Y":7.13404131},{"IsEmpty":false,"X":53.9345245,"Y":7.117799},{"IsEmpty":false,"X":53.93521,"Y":7.115947},{"IsEmpty":false,"X":53.9659233,"Y":7.12745953},{"IsEmpty":false,"X":54.02417,"Y":7.151306},{"IsEmpty":false,"X":54.107357,"Y":7.18645954},{"IsEmpty":false,"X":54.21287,"Y":7.23190546},{"IsEmpty":false,"X":54.3381,"Y":7.286651},{"IsEmpty":false,"X":54.4805031,"Y":7.3497324},{"IsEmpty":false,"X":54.6376343,"Y":7.420221},{"IsEmpty":false,"X":54.80718,"Y":7.497228},{"IsEmpty":false,"X":54.98697,"Y":7.57991028},{"IsEmpty":false,"X":55.1750031,"Y":7.667472},{"IsEmpty":false,"X":55.36944,"Y":7.759165},{"IsEmpty":false,"X":55.56862,"Y":7.85429335},{"IsEmpty":false,"X":55.7710457,"Y":7.95221043},{"IsEmpty":false,"X":55.9753876,"Y":8.05232},{"IsEmpty":false,"X":56.1804733,"Y":8.154073},{"IsEmpty":false,"X":56.38527,"Y":8.256969},{"IsEmpty":false,"X":56.5888824,"Y":8.360555},{"IsEmpty":false,"X":56.79055,"Y":8.464417},{"IsEmpty":false,"X":56.98961,"Y":8.568187},{"IsEmpty":false,"X":57.1855125,"Y":8.671531},{"IsEmpty":false,"X":57.3778,"Y":8.774155},{"IsEmpty":false,"X":57.5660934,"Y":8.875798},{"IsEmpty":false,"X":57.75009,"Y":8.976232},{"IsEmpty":false,"X":57.929554,"Y":9.075255},{"IsEmpty":false,"X":58.1043,"Y":9.172697},{"IsEmpty":false,"X":58.2742,"Y":9.268409},{"IsEmpty":false,"X":58.4391632,"Y":9.362267},{"IsEmpty":false,"X":58.5991364,"Y":9.454165},{"IsEmpty":false,"X":58.7541046,"Y":9.54402},{"IsEmpty":false,"X":58.90407,"Y":9.631763},{"IsEmpty":false,"X":59.04908,"Y":9.717343},{"IsEmpty":false,"X":59.18917,"Y":9.800721},{"IsEmpty":false,"X":59.3244171,"Y":9.881869},{"IsEmpty":false,"X":59.4549,"Y":9.960775},{"IsEmpty":false,"X":59.5807152,"Y":10.0374317},{"IsEmpty":false,"X":59.70196,"Y":10.1118441},{"IsEmpty":false,"X":59.81875,"Y":10.1840229},{"IsEmpty":false,"X":59.9311943,"Y":10.2539854},{"IsEmpty":false,"X":60.0394135,"Y":10.3217564},{"IsEmpty":false,"X":60.14353,"Y":10.3873644},{"IsEmpty":false,"X":60.2436676,"Y":10.4508429},{"IsEmpty":false,"X":60.3399467,"Y":10.512228},{"IsEmpty":false,"X":60.43249,"Y":10.57156},{"IsEmpty":false,"X":60.5214272,"Y":10.6288815},{"IsEmpty":false,"X":60.6068764,"Y":10.6842365},{"IsEmpty":false,"X":60.6889534,"Y":10.7376709},{"IsEmpty":false,"X":60.7677879,"Y":10.7892313},{"IsEmpty":false,"X":60.8434868,"Y":10.8389683},{"IsEmpty":false,"X":60.91617,"Y":10.8869286},{"IsEmpty":false,"X":60.98594,"Y":10.9331617},{"IsEmpty":false,"X":61.0529137,"Y":10.9777184},{"IsEmpty":false,"X":61.1171951,"Y":11.0206461},{"IsEmpty":false,"X":61.1788826,"Y":11.0619946},{"IsEmpty":false,"X":61.23808,"Y":11.1018124},{"IsEmpty":false,"X":61.2948761,"Y":11.1401472},{"IsEmpty":false,"X":61.3493729,"Y":11.1770477},{"IsEmpty":false,"X":61.4016533,"Y":11.2125587},{"IsEmpty":false,"X":61.45181,"Y":11.2467279},{"IsEmpty":false,"X":61.49992,"Y":11.2795992},{"IsEmpty":false,"X":61.5460739,"Y":11.3112173},{"IsEmpty":false,"X":61.59034,"Y":11.3416252},{"IsEmpty":false,"X":61.6327972,"Y":11.3708639},{"IsEmpty":false,"X":61.6735229,"Y":11.3989744},{"IsEmpty":false,"X":61.7125778,"Y":11.4259987},{"IsEmpty":false,"X":61.7500343,"Y":11.451973},{"IsEmpty":false,"X":61.7859573,"Y":11.4769373},{"IsEmpty":false,"X":61.8204079,"Y":11.500927},{"IsEmpty":false,"X":61.853447,"Y":11.5239782},{"IsEmpty":false,"X":61.885128,"Y":11.5461245},{"IsEmpty":false,"X":61.889122,"Y":11.5983067},{"IsEmpty":false,"X":61.776535,"Y":11.7031717},{"IsEmpty":false,"X":61.5268555,"Y":11.8413162},{"IsEmpty":false,"X":61.13603,"Y":12.0108461},{"IsEmpty":false,"X":60.60026,"Y":12.2114449},{"IsEmpty":false,"X":59.9156761,"Y":12.4429073},{"IsEmpty":false,"X":59.07918,"Y":12.7046461},{"IsEmpty":false,"X":58.08979,"Y":12.9951639},{"IsEmpty":false,"X":56.95023,"Y":13.31148},{"IsEmpty":false,"X":55.6686478,"Y":13.6485929},{"IsEmpty":false,"X":54.26008,"Y":13.9991579},{"IsEmpty":false,"X":52.7471466,"Y":14.3535337},{"IsEmpty":false,"X":51.159565,"Y":14.700346},{"IsEmpty":false,"X":49.5322762,"Y":15.0275135},{"IsEmpty":false,"X":47.902504,"Y":15.32354},{"IsEmpty":false,"X":46.30648,"Y":15.5787029},{"IsEmpty":false,"X":44.7766266,"Y":15.7858772},{"IsEmpty":false,"X":43.33979,"Y":15.94084},{"IsEmpty":false,"X":42.01669,"Y":16.0421143},{"IsEmpty":false,"X":40.82221,"Y":16.0905},{"IsEmpty":false,"X":39.766346,"Y":16.0884724},{"IsEmpty":false,"X":38.8345833,"Y":16.035017},{"IsEmpty":false,"X":37.9671631,"Y":15.9024191},{"IsEmpty":false,"X":37.179512,"Y":15.6960239},{"IsEmpty":false,"X":36.4889145,"Y":15.4281673},{"IsEmpty":false,"X":35.9083366,"Y":15.1099815},{"IsEmpty":false,"X":35.447094,"Y":14.7510262},{"IsEmpty":false,"X":35.1115761,"Y":14.35913},{"IsEmpty":false,"X":34.9059639,"Y":13.9404192},{"IsEmpty":false,"X":34.83282,"Y":13.4994965},{"IsEmpty":false,"X":34.89362,"Y":13.0397234},{"IsEmpty":false,"X":35.08911,"Y":12.5635729},{"IsEmpty":false,"X":35.1365356,"Y":12.5845556}]';
+                
+                var LA_upper_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":10,"Y":0.147323042},{"IsEmpty":false,"X":15,"Y":0.343973726},{"IsEmpty":false,"X":20,"Y":0.6064682},{"IsEmpty":false,"X":25,"Y":0.9568528},{"IsEmpty":false,"X":30,"Y":1.4245553},{"IsEmpty":false,"X":35,"Y":2.048857},{"IsEmpty":false,"X":40,"Y":2.88219118},{"IsEmpty":false,"X":45,"Y":3.99454784},{"IsEmpty":false,"X":50,"Y":5.47935057},{"IsEmpty":false,"X":55,"Y":7.46130466},{"IsEmpty":false,"X":60,"Y":10.1068687},{"IsEmpty":false,"X":65,"Y":13.638237},{"IsEmpty":false,"X":70,"Y":18.3520012},{"IsEmpty":false,"X":75,"Y":24.6440563},{"IsEmpty":false,"X":80,"Y":33.04286},{"IsEmpty":false,"X":85,"Y":44.2538},{"IsEmpty":false,"X":90,"Y":59.21846},{"IsEmpty":false,"X":95,"Y":79.19369},{"IsEmpty":false,"X":100,"Y":105.85714},{"IsEmpty":false,"X":105,"Y":141.448212},{"IsEmpty":false,"X":110,"Y":188.956131},{"IsEmpty":false,"X":115,"Y":252.370926},{"IsEmpty":false,"X":120,"Y":337.018677},{"IsEmpty":false,"X":125,"Y":450.008728}]';
+                var LA_bottom_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":1051.36658,"Y":500}]';
+                var LA_middle_json = '[{"IsEmpty":false,"X":35.1875954,"Y":12.485673},{"IsEmpty":false,"X":35.53347,"Y":11.99584},{"IsEmpty":false,"X":36.0104027,"Y":11.5106869},{"IsEmpty":false,"X":36.6126747,"Y":11.0307026},{"IsEmpty":false,"X":37.3346024,"Y":10.557744},{"IsEmpty":false,"X":38.1699753,"Y":10.0952864},{"IsEmpty":false,"X":39.15633,"Y":9.285107},{"IsEmpty":false,"X":40.40817,"Y":8.41873},{"IsEmpty":false,"X":41.8225,"Y":7.869803},{"IsEmpty":false,"X":43.3064,"Y":7.56552362},{"IsEmpty":false,"X":44.7908669,"Y":7.453822},{"IsEmpty":false,"X":46.22512,"Y":7.490946},{"IsEmpty":false,"X":47.5758247,"Y":7.63113928},{"IsEmpty":false,"X":48.82275,"Y":7.84461641},{"IsEmpty":false,"X":49.9551964,"Y":8.106119},{"IsEmpty":false,"X":50.97019,"Y":8.394502},{"IsEmpty":false,"X":51.8708076,"Y":8.692692},{"IsEmpty":false,"X":52.6645432,"Y":8.987616},{"IsEmpty":false,"X":53.36186,"Y":9.26997948},{"IsEmpty":false,"X":53.9748726,"Y":9.533894},{"IsEmpty":false,"X":54.51629,"Y":9.776374},{"IsEmpty":false,"X":54.9985161,"Y":9.996758},{"IsEmpty":false,"X":55.43306,"Y":10.1961126},{"IsEmpty":false,"X":55.8301048,"Y":10.3766632},{"IsEmpty":false,"X":56.1982956,"Y":10.541297},{"IsEmpty":false,"X":56.5446663,"Y":10.6931458},{"IsEmpty":false,"X":56.87471,"Y":10.8352709},{"IsEmpty":false,"X":57.1924934,"Y":10.9704351},{"IsEmpty":false,"X":57.5008736,"Y":11.1009665},{"IsEmpty":false,"X":57.80169,"Y":11.228694},{"IsEmpty":false,"X":58.09598,"Y":11.3549414},{"IsEmpty":false,"X":58.38421,"Y":11.4805622},{"IsEmpty":false,"X":58.66641,"Y":11.6059971},{"IsEmpty":false,"X":58.94236,"Y":11.7313585},{"IsEmpty":false,"X":59.2116928,"Y":11.8565006},{"IsEmpty":false,"X":59.4739838,"Y":11.9810991},{"IsEmpty":false,"X":59.72883,"Y":12.10472},{"IsEmpty":false,"X":59.9758644,"Y":12.2268677},{"IsEmpty":false,"X":60.2148132,"Y":12.3470335},{"IsEmpty":false,"X":60.44548,"Y":12.4647255},{"IsEmpty":false,"X":60.6677742,"Y":12.5794868},{"IsEmpty":false,"X":60.88168,"Y":12.6909122},{"IsEmpty":false,"X":61.08727,"Y":12.7986526},{"IsEmpty":false,"X":61.28468,"Y":12.9024153},{"IsEmpty":false,"X":61.4741173,"Y":13.0019627},{"IsEmpty":false,"X":61.6559334,"Y":13.0961132},{"IsEmpty":false,"X":61.8314247,"Y":13.1817064},{"IsEmpty":false,"X":62.0020332,"Y":13.2595043},{"IsEmpty":false,"X":62.1688423,"Y":13.3304367},{"IsEmpty":false,"X":62.3326263,"Y":13.3952827},{"IsEmpty":false,"X":62.49395,"Y":13.4547091},{"IsEmpty":false,"X":62.65321,"Y":13.509305},{"IsEmpty":false,"X":62.8106728,"Y":13.5596075},{"IsEmpty":false,"X":62.9665222,"Y":13.6061077},{"IsEmpty":false,"X":63.1208344,"Y":13.6492634},{"IsEmpty":false,"X":63.273632,"Y":13.6894989},{"IsEmpty":false,"X":63.42487,"Y":13.72721},{"IsEmpty":false,"X":63.57444,"Y":13.762763},{"IsEmpty":false,"X":63.7222,"Y":13.7964964},{"IsEmpty":false,"X":63.86795,"Y":13.8287239},{"IsEmpty":false,"X":64.0114746,"Y":13.8597288},{"IsEmpty":false,"X":64.1557541,"Y":13.8750982},{"IsEmpty":false,"X":64.29964,"Y":13.9007607},{"IsEmpty":false,"X":64.4398956,"Y":13.9331255},{"IsEmpty":false,"X":64.5744858,"Y":13.969574},{"IsEmpty":false,"X":64.70217,"Y":14.0082188},{"IsEmpty":false,"X":64.82231,"Y":14.0477123},{"IsEmpty":false,"X":64.9346848,"Y":14.0871153},{"IsEmpty":false,"X":65.03932,"Y":14.1257811},{"IsEmpty":false,"X":65.1364441,"Y":14.1632814},{"IsEmpty":false,"X":65.22639,"Y":14.1993465},{"IsEmpty":false,"X":65.30954,"Y":14.2338161},{"IsEmpty":false,"X":65.38634,"Y":14.266613},{"IsEmpty":false,"X":65.45722,"Y":14.2977142},{"IsEmpty":false,"X":64.97672,"Y":14.0313654},{"IsEmpty":false,"X":64.07393,"Y":13.2961836},{"IsEmpty":false,"X":63.21457,"Y":12.6201448},{"IsEmpty":false,"X":62.4067039,"Y":12.0152836},{"IsEmpty":false,"X":61.6438675,"Y":11.4703217},{"IsEmpty":false,"X":60.92093,"Y":10.9761677},{"IsEmpty":false,"X":60.2343445,"Y":10.5259914},{"IsEmpty":false,"X":59.58185,"Y":10.1146469},{"IsEmpty":false,"X":58.9622154,"Y":9.738237},{"IsEmpty":false,"X":58.37503,"Y":9.393786},{"IsEmpty":false,"X":57.8204956,"Y":9.078995},{"IsEmpty":false,"X":57.2992821,"Y":8.792062},{"IsEmpty":false,"X":56.8123627,"Y":8.531543},{"IsEmpty":false,"X":56.36088,"Y":8.296249},{"IsEmpty":false,"X":55.9460449,"Y":8.085165},{"IsEmpty":false,"X":55.56899,"Y":7.89738464},{"IsEmpty":false,"X":55.2306938,"Y":7.732066},{"IsEmpty":false,"X":54.9319077,"Y":7.588398},{"IsEmpty":false,"X":54.6730537,"Y":7.46557},{"IsEmpty":false,"X":54.4542,"Y":7.3627553},{"IsEmpty":false,"X":54.2750168,"Y":7.27910137},{"IsEmpty":false,"X":54.13477,"Y":7.21371937},{"IsEmpty":false,"X":54.0323257,"Y":7.165685},{"IsEmpty":false,"X":53.96619,"Y":7.13404131},{"IsEmpty":false,"X":53.9345245,"Y":7.117799},{"IsEmpty":false,"X":53.93521,"Y":7.115947},{"IsEmpty":false,"X":53.9659233,"Y":7.12745953},{"IsEmpty":false,"X":54.02417,"Y":7.151306},{"IsEmpty":false,"X":54.107357,"Y":7.18645954},{"IsEmpty":false,"X":54.21287,"Y":7.23190546},{"IsEmpty":false,"X":54.3381,"Y":7.286651},{"IsEmpty":false,"X":54.4805031,"Y":7.3497324},{"IsEmpty":false,"X":54.6376343,"Y":7.420221},{"IsEmpty":false,"X":54.80718,"Y":7.497228},{"IsEmpty":false,"X":54.98697,"Y":7.57991028},{"IsEmpty":false,"X":55.1750031,"Y":7.667472},{"IsEmpty":false,"X":55.36944,"Y":7.759165},{"IsEmpty":false,"X":55.56862,"Y":7.85429335},{"IsEmpty":false,"X":55.7710457,"Y":7.95221043},{"IsEmpty":false,"X":55.9753876,"Y":8.05232},{"IsEmpty":false,"X":56.1804733,"Y":8.154073},{"IsEmpty":false,"X":56.38527,"Y":8.256969},{"IsEmpty":false,"X":56.5888824,"Y":8.360555},{"IsEmpty":false,"X":56.79055,"Y":8.464417},{"IsEmpty":false,"X":56.98961,"Y":8.568187},{"IsEmpty":false,"X":57.1855125,"Y":8.671531},{"IsEmpty":false,"X":57.3778,"Y":8.774155},{"IsEmpty":false,"X":57.5660934,"Y":8.875798},{"IsEmpty":false,"X":57.75009,"Y":8.976232},{"IsEmpty":false,"X":57.929554,"Y":9.075255},{"IsEmpty":false,"X":58.1043,"Y":9.172697},{"IsEmpty":false,"X":58.2742,"Y":9.268409},{"IsEmpty":false,"X":58.4391632,"Y":9.362267},{"IsEmpty":false,"X":58.5991364,"Y":9.454165},{"IsEmpty":false,"X":58.7541046,"Y":9.54402},{"IsEmpty":false,"X":58.90407,"Y":9.631763},{"IsEmpty":false,"X":59.04908,"Y":9.717343},{"IsEmpty":false,"X":59.18917,"Y":9.800721},{"IsEmpty":false,"X":59.3244171,"Y":9.881869},{"IsEmpty":false,"X":59.4549,"Y":9.960775},{"IsEmpty":false,"X":59.5807152,"Y":10.0374317},{"IsEmpty":false,"X":59.70196,"Y":10.1118441},{"IsEmpty":false,"X":59.81875,"Y":10.1840229},{"IsEmpty":false,"X":59.9311943,"Y":10.2539854},{"IsEmpty":false,"X":60.0394135,"Y":10.3217564},{"IsEmpty":false,"X":60.14353,"Y":10.3873644},{"IsEmpty":false,"X":60.2436676,"Y":10.4508429},{"IsEmpty":false,"X":60.3399467,"Y":10.512228},{"IsEmpty":false,"X":60.43249,"Y":10.57156},{"IsEmpty":false,"X":60.5214272,"Y":10.6288815},{"IsEmpty":false,"X":60.6068764,"Y":10.6842365},{"IsEmpty":false,"X":60.6889534,"Y":10.7376709},{"IsEmpty":false,"X":60.7677879,"Y":10.7892313},{"IsEmpty":false,"X":60.8434868,"Y":10.8389683},{"IsEmpty":false,"X":60.91617,"Y":10.8869286},{"IsEmpty":false,"X":60.98594,"Y":10.9331617},{"IsEmpty":false,"X":61.0529137,"Y":10.9777184},{"IsEmpty":false,"X":61.1171951,"Y":11.0206461},{"IsEmpty":false,"X":61.1788826,"Y":11.0619946},{"IsEmpty":false,"X":61.23808,"Y":11.1018124},{"IsEmpty":false,"X":61.2948761,"Y":11.1401472},{"IsEmpty":false,"X":61.3493729,"Y":11.1770477},{"IsEmpty":false,"X":61.4016533,"Y":11.2125587},{"IsEmpty":false,"X":61.45181,"Y":11.2467279},{"IsEmpty":false,"X":61.49992,"Y":11.2795992},{"IsEmpty":false,"X":61.5460739,"Y":11.3112173},{"IsEmpty":false,"X":61.59034,"Y":11.3416252},{"IsEmpty":false,"X":61.6327972,"Y":11.3708639},{"IsEmpty":false,"X":61.6735229,"Y":11.3989744},{"IsEmpty":false,"X":61.7125778,"Y":11.4259987},{"IsEmpty":false,"X":61.7500343,"Y":11.451973},{"IsEmpty":false,"X":61.7859573,"Y":11.4769373},{"IsEmpty":false,"X":61.8204079,"Y":11.500927},{"IsEmpty":false,"X":61.853447,"Y":11.5239782},{"IsEmpty":false,"X":61.885128,"Y":11.5461245},{"IsEmpty":false,"X":61.889122,"Y":11.5983067},{"IsEmpty":false,"X":61.776535,"Y":11.7031717},{"IsEmpty":false,"X":61.5268555,"Y":11.8413162},{"IsEmpty":false,"X":61.13603,"Y":12.0108461},{"IsEmpty":false,"X":60.60026,"Y":12.2114449},{"IsEmpty":false,"X":59.9156761,"Y":12.4429073},{"IsEmpty":false,"X":59.07918,"Y":12.7046461},{"IsEmpty":false,"X":58.08979,"Y":12.9951639},{"IsEmpty":false,"X":56.95023,"Y":13.31148},{"IsEmpty":false,"X":55.6686478,"Y":13.6485929},{"IsEmpty":false,"X":54.26008,"Y":13.9991579},{"IsEmpty":false,"X":52.7471466,"Y":14.3535337},{"IsEmpty":false,"X":51.159565,"Y":14.700346},{"IsEmpty":false,"X":49.5322762,"Y":15.0275135},{"IsEmpty":false,"X":47.902504,"Y":15.32354},{"IsEmpty":false,"X":46.30648,"Y":15.5787029},{"IsEmpty":false,"X":44.7766266,"Y":15.7858772},{"IsEmpty":false,"X":43.33979,"Y":15.94084},{"IsEmpty":false,"X":42.01669,"Y":16.0421143},{"IsEmpty":false,"X":40.82221,"Y":16.0905},{"IsEmpty":false,"X":39.766346,"Y":16.0884724},{"IsEmpty":false,"X":38.8345833,"Y":16.035017},{"IsEmpty":false,"X":37.9671631,"Y":15.9024191},{"IsEmpty":false,"X":37.179512,"Y":15.6960239},{"IsEmpty":false,"X":36.4889145,"Y":15.4281673},{"IsEmpty":false,"X":35.9083366,"Y":15.1099815},{"IsEmpty":false,"X":35.447094,"Y":14.7510262},{"IsEmpty":false,"X":35.1115761,"Y":14.35913},{"IsEmpty":false,"X":34.9059639,"Y":13.9404192},{"IsEmpty":false,"X":34.83282,"Y":13.4994965},{"IsEmpty":false,"X":34.89362,"Y":13.0397234},{"IsEmpty":false,"X":35.08911,"Y":12.5635729},{"IsEmpty":false,"X":35.1365356,"Y":12.5845556}]';
+                
+                var RV_upper_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":10,"Y":0.147323042},{"IsEmpty":false,"X":15,"Y":0.343973726},{"IsEmpty":false,"X":20,"Y":0.6064682},{"IsEmpty":false,"X":25,"Y":0.9568528},{"IsEmpty":false,"X":30,"Y":1.4245553},{"IsEmpty":false,"X":35,"Y":2.048857},{"IsEmpty":false,"X":40,"Y":2.88219118},{"IsEmpty":false,"X":45,"Y":3.99454784},{"IsEmpty":false,"X":50,"Y":5.47935057},{"IsEmpty":false,"X":55,"Y":7.46130466},{"IsEmpty":false,"X":60,"Y":10.1068687},{"IsEmpty":false,"X":65,"Y":13.638237},{"IsEmpty":false,"X":70,"Y":18.3520012},{"IsEmpty":false,"X":75,"Y":24.6440563},{"IsEmpty":false,"X":80,"Y":33.04286},{"IsEmpty":false,"X":85,"Y":44.2538},{"IsEmpty":false,"X":90,"Y":59.21846},{"IsEmpty":false,"X":95,"Y":79.19369},{"IsEmpty":false,"X":100,"Y":105.85714},{"IsEmpty":false,"X":105,"Y":141.448212},{"IsEmpty":false,"X":110,"Y":188.956131},{"IsEmpty":false,"X":115,"Y":252.370926},{"IsEmpty":false,"X":120,"Y":337.018677},{"IsEmpty":false,"X":125,"Y":450.008728}]';
+                var RV_bottom_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":1051.36658,"Y":500}]';
+                var RV_middle_json = '[{"IsEmpty":false,"X":35.1875954,"Y":12.485673},{"IsEmpty":false,"X":35.53347,"Y":11.99584},{"IsEmpty":false,"X":36.0104027,"Y":11.5106869},{"IsEmpty":false,"X":36.6126747,"Y":11.0307026},{"IsEmpty":false,"X":37.3346024,"Y":10.557744},{"IsEmpty":false,"X":38.1699753,"Y":10.0952864},{"IsEmpty":false,"X":39.15633,"Y":9.285107},{"IsEmpty":false,"X":40.40817,"Y":8.41873},{"IsEmpty":false,"X":41.8225,"Y":7.869803},{"IsEmpty":false,"X":43.3064,"Y":7.56552362},{"IsEmpty":false,"X":44.7908669,"Y":7.453822},{"IsEmpty":false,"X":46.22512,"Y":7.490946},{"IsEmpty":false,"X":47.5758247,"Y":7.63113928},{"IsEmpty":false,"X":48.82275,"Y":7.84461641},{"IsEmpty":false,"X":49.9551964,"Y":8.106119},{"IsEmpty":false,"X":50.97019,"Y":8.394502},{"IsEmpty":false,"X":51.8708076,"Y":8.692692},{"IsEmpty":false,"X":52.6645432,"Y":8.987616},{"IsEmpty":false,"X":53.36186,"Y":9.26997948},{"IsEmpty":false,"X":53.9748726,"Y":9.533894},{"IsEmpty":false,"X":54.51629,"Y":9.776374},{"IsEmpty":false,"X":54.9985161,"Y":9.996758},{"IsEmpty":false,"X":55.43306,"Y":10.1961126},{"IsEmpty":false,"X":55.8301048,"Y":10.3766632},{"IsEmpty":false,"X":56.1982956,"Y":10.541297},{"IsEmpty":false,"X":56.5446663,"Y":10.6931458},{"IsEmpty":false,"X":56.87471,"Y":10.8352709},{"IsEmpty":false,"X":57.1924934,"Y":10.9704351},{"IsEmpty":false,"X":57.5008736,"Y":11.1009665},{"IsEmpty":false,"X":57.80169,"Y":11.228694},{"IsEmpty":false,"X":58.09598,"Y":11.3549414},{"IsEmpty":false,"X":58.38421,"Y":11.4805622},{"IsEmpty":false,"X":58.66641,"Y":11.6059971},{"IsEmpty":false,"X":58.94236,"Y":11.7313585},{"IsEmpty":false,"X":59.2116928,"Y":11.8565006},{"IsEmpty":false,"X":59.4739838,"Y":11.9810991},{"IsEmpty":false,"X":59.72883,"Y":12.10472},{"IsEmpty":false,"X":59.9758644,"Y":12.2268677},{"IsEmpty":false,"X":60.2148132,"Y":12.3470335},{"IsEmpty":false,"X":60.44548,"Y":12.4647255},{"IsEmpty":false,"X":60.6677742,"Y":12.5794868},{"IsEmpty":false,"X":60.88168,"Y":12.6909122},{"IsEmpty":false,"X":61.08727,"Y":12.7986526},{"IsEmpty":false,"X":61.28468,"Y":12.9024153},{"IsEmpty":false,"X":61.4741173,"Y":13.0019627},{"IsEmpty":false,"X":61.6559334,"Y":13.0961132},{"IsEmpty":false,"X":61.8314247,"Y":13.1817064},{"IsEmpty":false,"X":62.0020332,"Y":13.2595043},{"IsEmpty":false,"X":62.1688423,"Y":13.3304367},{"IsEmpty":false,"X":62.3326263,"Y":13.3952827},{"IsEmpty":false,"X":62.49395,"Y":13.4547091},{"IsEmpty":false,"X":62.65321,"Y":13.509305},{"IsEmpty":false,"X":62.8106728,"Y":13.5596075},{"IsEmpty":false,"X":62.9665222,"Y":13.6061077},{"IsEmpty":false,"X":63.1208344,"Y":13.6492634},{"IsEmpty":false,"X":63.273632,"Y":13.6894989},{"IsEmpty":false,"X":63.42487,"Y":13.72721},{"IsEmpty":false,"X":63.57444,"Y":13.762763},{"IsEmpty":false,"X":63.7222,"Y":13.7964964},{"IsEmpty":false,"X":63.86795,"Y":13.8287239},{"IsEmpty":false,"X":64.0114746,"Y":13.8597288},{"IsEmpty":false,"X":64.1557541,"Y":13.8750982},{"IsEmpty":false,"X":64.29964,"Y":13.9007607},{"IsEmpty":false,"X":64.4398956,"Y":13.9331255},{"IsEmpty":false,"X":64.5744858,"Y":13.969574},{"IsEmpty":false,"X":64.70217,"Y":14.0082188},{"IsEmpty":false,"X":64.82231,"Y":14.0477123},{"IsEmpty":false,"X":64.9346848,"Y":14.0871153},{"IsEmpty":false,"X":65.03932,"Y":14.1257811},{"IsEmpty":false,"X":65.1364441,"Y":14.1632814},{"IsEmpty":false,"X":65.22639,"Y":14.1993465},{"IsEmpty":false,"X":65.30954,"Y":14.2338161},{"IsEmpty":false,"X":65.38634,"Y":14.266613},{"IsEmpty":false,"X":65.45722,"Y":14.2977142},{"IsEmpty":false,"X":64.97672,"Y":14.0313654},{"IsEmpty":false,"X":64.07393,"Y":13.2961836},{"IsEmpty":false,"X":63.21457,"Y":12.6201448},{"IsEmpty":false,"X":62.4067039,"Y":12.0152836},{"IsEmpty":false,"X":61.6438675,"Y":11.4703217},{"IsEmpty":false,"X":60.92093,"Y":10.9761677},{"IsEmpty":false,"X":60.2343445,"Y":10.5259914},{"IsEmpty":false,"X":59.58185,"Y":10.1146469},{"IsEmpty":false,"X":58.9622154,"Y":9.738237},{"IsEmpty":false,"X":58.37503,"Y":9.393786},{"IsEmpty":false,"X":57.8204956,"Y":9.078995},{"IsEmpty":false,"X":57.2992821,"Y":8.792062},{"IsEmpty":false,"X":56.8123627,"Y":8.531543},{"IsEmpty":false,"X":56.36088,"Y":8.296249},{"IsEmpty":false,"X":55.9460449,"Y":8.085165},{"IsEmpty":false,"X":55.56899,"Y":7.89738464},{"IsEmpty":false,"X":55.2306938,"Y":7.732066},{"IsEmpty":false,"X":54.9319077,"Y":7.588398},{"IsEmpty":false,"X":54.6730537,"Y":7.46557},{"IsEmpty":false,"X":54.4542,"Y":7.3627553},{"IsEmpty":false,"X":54.2750168,"Y":7.27910137},{"IsEmpty":false,"X":54.13477,"Y":7.21371937},{"IsEmpty":false,"X":54.0323257,"Y":7.165685},{"IsEmpty":false,"X":53.96619,"Y":7.13404131},{"IsEmpty":false,"X":53.9345245,"Y":7.117799},{"IsEmpty":false,"X":53.93521,"Y":7.115947},{"IsEmpty":false,"X":53.9659233,"Y":7.12745953},{"IsEmpty":false,"X":54.02417,"Y":7.151306},{"IsEmpty":false,"X":54.107357,"Y":7.18645954},{"IsEmpty":false,"X":54.21287,"Y":7.23190546},{"IsEmpty":false,"X":54.3381,"Y":7.286651},{"IsEmpty":false,"X":54.4805031,"Y":7.3497324},{"IsEmpty":false,"X":54.6376343,"Y":7.420221},{"IsEmpty":false,"X":54.80718,"Y":7.497228},{"IsEmpty":false,"X":54.98697,"Y":7.57991028},{"IsEmpty":false,"X":55.1750031,"Y":7.667472},{"IsEmpty":false,"X":55.36944,"Y":7.759165},{"IsEmpty":false,"X":55.56862,"Y":7.85429335},{"IsEmpty":false,"X":55.7710457,"Y":7.95221043},{"IsEmpty":false,"X":55.9753876,"Y":8.05232},{"IsEmpty":false,"X":56.1804733,"Y":8.154073},{"IsEmpty":false,"X":56.38527,"Y":8.256969},{"IsEmpty":false,"X":56.5888824,"Y":8.360555},{"IsEmpty":false,"X":56.79055,"Y":8.464417},{"IsEmpty":false,"X":56.98961,"Y":8.568187},{"IsEmpty":false,"X":57.1855125,"Y":8.671531},{"IsEmpty":false,"X":57.3778,"Y":8.774155},{"IsEmpty":false,"X":57.5660934,"Y":8.875798},{"IsEmpty":false,"X":57.75009,"Y":8.976232},{"IsEmpty":false,"X":57.929554,"Y":9.075255},{"IsEmpty":false,"X":58.1043,"Y":9.172697},{"IsEmpty":false,"X":58.2742,"Y":9.268409},{"IsEmpty":false,"X":58.4391632,"Y":9.362267},{"IsEmpty":false,"X":58.5991364,"Y":9.454165},{"IsEmpty":false,"X":58.7541046,"Y":9.54402},{"IsEmpty":false,"X":58.90407,"Y":9.631763},{"IsEmpty":false,"X":59.04908,"Y":9.717343},{"IsEmpty":false,"X":59.18917,"Y":9.800721},{"IsEmpty":false,"X":59.3244171,"Y":9.881869},{"IsEmpty":false,"X":59.4549,"Y":9.960775},{"IsEmpty":false,"X":59.5807152,"Y":10.0374317},{"IsEmpty":false,"X":59.70196,"Y":10.1118441},{"IsEmpty":false,"X":59.81875,"Y":10.1840229},{"IsEmpty":false,"X":59.9311943,"Y":10.2539854},{"IsEmpty":false,"X":60.0394135,"Y":10.3217564},{"IsEmpty":false,"X":60.14353,"Y":10.3873644},{"IsEmpty":false,"X":60.2436676,"Y":10.4508429},{"IsEmpty":false,"X":60.3399467,"Y":10.512228},{"IsEmpty":false,"X":60.43249,"Y":10.57156},{"IsEmpty":false,"X":60.5214272,"Y":10.6288815},{"IsEmpty":false,"X":60.6068764,"Y":10.6842365},{"IsEmpty":false,"X":60.6889534,"Y":10.7376709},{"IsEmpty":false,"X":60.7677879,"Y":10.7892313},{"IsEmpty":false,"X":60.8434868,"Y":10.8389683},{"IsEmpty":false,"X":60.91617,"Y":10.8869286},{"IsEmpty":false,"X":60.98594,"Y":10.9331617},{"IsEmpty":false,"X":61.0529137,"Y":10.9777184},{"IsEmpty":false,"X":61.1171951,"Y":11.0206461},{"IsEmpty":false,"X":61.1788826,"Y":11.0619946},{"IsEmpty":false,"X":61.23808,"Y":11.1018124},{"IsEmpty":false,"X":61.2948761,"Y":11.1401472},{"IsEmpty":false,"X":61.3493729,"Y":11.1770477},{"IsEmpty":false,"X":61.4016533,"Y":11.2125587},{"IsEmpty":false,"X":61.45181,"Y":11.2467279},{"IsEmpty":false,"X":61.49992,"Y":11.2795992},{"IsEmpty":false,"X":61.5460739,"Y":11.3112173},{"IsEmpty":false,"X":61.59034,"Y":11.3416252},{"IsEmpty":false,"X":61.6327972,"Y":11.3708639},{"IsEmpty":false,"X":61.6735229,"Y":11.3989744},{"IsEmpty":false,"X":61.7125778,"Y":11.4259987},{"IsEmpty":false,"X":61.7500343,"Y":11.451973},{"IsEmpty":false,"X":61.7859573,"Y":11.4769373},{"IsEmpty":false,"X":61.8204079,"Y":11.500927},{"IsEmpty":false,"X":61.853447,"Y":11.5239782},{"IsEmpty":false,"X":61.885128,"Y":11.5461245},{"IsEmpty":false,"X":61.889122,"Y":11.5983067},{"IsEmpty":false,"X":61.776535,"Y":11.7031717},{"IsEmpty":false,"X":61.5268555,"Y":11.8413162},{"IsEmpty":false,"X":61.13603,"Y":12.0108461},{"IsEmpty":false,"X":60.60026,"Y":12.2114449},{"IsEmpty":false,"X":59.9156761,"Y":12.4429073},{"IsEmpty":false,"X":59.07918,"Y":12.7046461},{"IsEmpty":false,"X":58.08979,"Y":12.9951639},{"IsEmpty":false,"X":56.95023,"Y":13.31148},{"IsEmpty":false,"X":55.6686478,"Y":13.6485929},{"IsEmpty":false,"X":54.26008,"Y":13.9991579},{"IsEmpty":false,"X":52.7471466,"Y":14.3535337},{"IsEmpty":false,"X":51.159565,"Y":14.700346},{"IsEmpty":false,"X":49.5322762,"Y":15.0275135},{"IsEmpty":false,"X":47.902504,"Y":15.32354},{"IsEmpty":false,"X":46.30648,"Y":15.5787029},{"IsEmpty":false,"X":44.7766266,"Y":15.7858772},{"IsEmpty":false,"X":43.33979,"Y":15.94084},{"IsEmpty":false,"X":42.01669,"Y":16.0421143},{"IsEmpty":false,"X":40.82221,"Y":16.0905},{"IsEmpty":false,"X":39.766346,"Y":16.0884724},{"IsEmpty":false,"X":38.8345833,"Y":16.035017},{"IsEmpty":false,"X":37.9671631,"Y":15.9024191},{"IsEmpty":false,"X":37.179512,"Y":15.6960239},{"IsEmpty":false,"X":36.4889145,"Y":15.4281673},{"IsEmpty":false,"X":35.9083366,"Y":15.1099815},{"IsEmpty":false,"X":35.447094,"Y":14.7510262},{"IsEmpty":false,"X":35.1115761,"Y":14.35913},{"IsEmpty":false,"X":34.9059639,"Y":13.9404192},{"IsEmpty":false,"X":34.83282,"Y":13.4994965},{"IsEmpty":false,"X":34.89362,"Y":13.0397234},{"IsEmpty":false,"X":35.08911,"Y":12.5635729},{"IsEmpty":false,"X":35.1365356,"Y":12.5845556}]';
+                
+                var LV_upper_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":10,"Y":0.147323042},{"IsEmpty":false,"X":15,"Y":0.343973726},{"IsEmpty":false,"X":20,"Y":0.6064682},{"IsEmpty":false,"X":25,"Y":0.9568528},{"IsEmpty":false,"X":30,"Y":1.4245553},{"IsEmpty":false,"X":35,"Y":2.048857},{"IsEmpty":false,"X":40,"Y":2.88219118},{"IsEmpty":false,"X":45,"Y":3.99454784},{"IsEmpty":false,"X":50,"Y":5.47935057},{"IsEmpty":false,"X":55,"Y":7.46130466},{"IsEmpty":false,"X":60,"Y":10.1068687},{"IsEmpty":false,"X":65,"Y":13.638237},{"IsEmpty":false,"X":70,"Y":18.3520012},{"IsEmpty":false,"X":75,"Y":24.6440563},{"IsEmpty":false,"X":80,"Y":33.04286},{"IsEmpty":false,"X":85,"Y":44.2538},{"IsEmpty":false,"X":90,"Y":59.21846},{"IsEmpty":false,"X":95,"Y":79.19369},{"IsEmpty":false,"X":100,"Y":105.85714},{"IsEmpty":false,"X":105,"Y":141.448212},{"IsEmpty":false,"X":110,"Y":188.956131},{"IsEmpty":false,"X":115,"Y":252.370926},{"IsEmpty":false,"X":120,"Y":337.018677},{"IsEmpty":false,"X":125,"Y":450.008728}]';
+                var LV_bottom_json = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":1051.36658,"Y":500}]';
+                var LV_middle_json = '[{"IsEmpty":false,"X":35.1875954,"Y":12.485673},{"IsEmpty":false,"X":35.53347,"Y":11.99584},{"IsEmpty":false,"X":36.0104027,"Y":11.5106869},{"IsEmpty":false,"X":36.6126747,"Y":11.0307026},{"IsEmpty":false,"X":37.3346024,"Y":10.557744},{"IsEmpty":false,"X":38.1699753,"Y":10.0952864},{"IsEmpty":false,"X":39.15633,"Y":9.285107},{"IsEmpty":false,"X":40.40817,"Y":8.41873},{"IsEmpty":false,"X":41.8225,"Y":7.869803},{"IsEmpty":false,"X":43.3064,"Y":7.56552362},{"IsEmpty":false,"X":44.7908669,"Y":7.453822},{"IsEmpty":false,"X":46.22512,"Y":7.490946},{"IsEmpty":false,"X":47.5758247,"Y":7.63113928},{"IsEmpty":false,"X":48.82275,"Y":7.84461641},{"IsEmpty":false,"X":49.9551964,"Y":8.106119},{"IsEmpty":false,"X":50.97019,"Y":8.394502},{"IsEmpty":false,"X":51.8708076,"Y":8.692692},{"IsEmpty":false,"X":52.6645432,"Y":8.987616},{"IsEmpty":false,"X":53.36186,"Y":9.26997948},{"IsEmpty":false,"X":53.9748726,"Y":9.533894},{"IsEmpty":false,"X":54.51629,"Y":9.776374},{"IsEmpty":false,"X":54.9985161,"Y":9.996758},{"IsEmpty":false,"X":55.43306,"Y":10.1961126},{"IsEmpty":false,"X":55.8301048,"Y":10.3766632},{"IsEmpty":false,"X":56.1982956,"Y":10.541297},{"IsEmpty":false,"X":56.5446663,"Y":10.6931458},{"IsEmpty":false,"X":56.87471,"Y":10.8352709},{"IsEmpty":false,"X":57.1924934,"Y":10.9704351},{"IsEmpty":false,"X":57.5008736,"Y":11.1009665},{"IsEmpty":false,"X":57.80169,"Y":11.228694},{"IsEmpty":false,"X":58.09598,"Y":11.3549414},{"IsEmpty":false,"X":58.38421,"Y":11.4805622},{"IsEmpty":false,"X":58.66641,"Y":11.6059971},{"IsEmpty":false,"X":58.94236,"Y":11.7313585},{"IsEmpty":false,"X":59.2116928,"Y":11.8565006},{"IsEmpty":false,"X":59.4739838,"Y":11.9810991},{"IsEmpty":false,"X":59.72883,"Y":12.10472},{"IsEmpty":false,"X":59.9758644,"Y":12.2268677},{"IsEmpty":false,"X":60.2148132,"Y":12.3470335},{"IsEmpty":false,"X":60.44548,"Y":12.4647255},{"IsEmpty":false,"X":60.6677742,"Y":12.5794868},{"IsEmpty":false,"X":60.88168,"Y":12.6909122},{"IsEmpty":false,"X":61.08727,"Y":12.7986526},{"IsEmpty":false,"X":61.28468,"Y":12.9024153},{"IsEmpty":false,"X":61.4741173,"Y":13.0019627},{"IsEmpty":false,"X":61.6559334,"Y":13.0961132},{"IsEmpty":false,"X":61.8314247,"Y":13.1817064},{"IsEmpty":false,"X":62.0020332,"Y":13.2595043},{"IsEmpty":false,"X":62.1688423,"Y":13.3304367},{"IsEmpty":false,"X":62.3326263,"Y":13.3952827},{"IsEmpty":false,"X":62.49395,"Y":13.4547091},{"IsEmpty":false,"X":62.65321,"Y":13.509305},{"IsEmpty":false,"X":62.8106728,"Y":13.5596075},{"IsEmpty":false,"X":62.9665222,"Y":13.6061077},{"IsEmpty":false,"X":63.1208344,"Y":13.6492634},{"IsEmpty":false,"X":63.273632,"Y":13.6894989},{"IsEmpty":false,"X":63.42487,"Y":13.72721},{"IsEmpty":false,"X":63.57444,"Y":13.762763},{"IsEmpty":false,"X":63.7222,"Y":13.7964964},{"IsEmpty":false,"X":63.86795,"Y":13.8287239},{"IsEmpty":false,"X":64.0114746,"Y":13.8597288},{"IsEmpty":false,"X":64.1557541,"Y":13.8750982},{"IsEmpty":false,"X":64.29964,"Y":13.9007607},{"IsEmpty":false,"X":64.4398956,"Y":13.9331255},{"IsEmpty":false,"X":64.5744858,"Y":13.969574},{"IsEmpty":false,"X":64.70217,"Y":14.0082188},{"IsEmpty":false,"X":64.82231,"Y":14.0477123},{"IsEmpty":false,"X":64.9346848,"Y":14.0871153},{"IsEmpty":false,"X":65.03932,"Y":14.1257811},{"IsEmpty":false,"X":65.1364441,"Y":14.1632814},{"IsEmpty":false,"X":65.22639,"Y":14.1993465},{"IsEmpty":false,"X":65.30954,"Y":14.2338161},{"IsEmpty":false,"X":65.38634,"Y":14.266613},{"IsEmpty":false,"X":65.45722,"Y":14.2977142},{"IsEmpty":false,"X":64.97672,"Y":14.0313654},{"IsEmpty":false,"X":64.07393,"Y":13.2961836},{"IsEmpty":false,"X":63.21457,"Y":12.6201448},{"IsEmpty":false,"X":62.4067039,"Y":12.0152836},{"IsEmpty":false,"X":61.6438675,"Y":11.4703217},{"IsEmpty":false,"X":60.92093,"Y":10.9761677},{"IsEmpty":false,"X":60.2343445,"Y":10.5259914},{"IsEmpty":false,"X":59.58185,"Y":10.1146469},{"IsEmpty":false,"X":58.9622154,"Y":9.738237},{"IsEmpty":false,"X":58.37503,"Y":9.393786},{"IsEmpty":false,"X":57.8204956,"Y":9.078995},{"IsEmpty":false,"X":57.2992821,"Y":8.792062},{"IsEmpty":false,"X":56.8123627,"Y":8.531543},{"IsEmpty":false,"X":56.36088,"Y":8.296249},{"IsEmpty":false,"X":55.9460449,"Y":8.085165},{"IsEmpty":false,"X":55.56899,"Y":7.89738464},{"IsEmpty":false,"X":55.2306938,"Y":7.732066},{"IsEmpty":false,"X":54.9319077,"Y":7.588398},{"IsEmpty":false,"X":54.6730537,"Y":7.46557},{"IsEmpty":false,"X":54.4542,"Y":7.3627553},{"IsEmpty":false,"X":54.2750168,"Y":7.27910137},{"IsEmpty":false,"X":54.13477,"Y":7.21371937},{"IsEmpty":false,"X":54.0323257,"Y":7.165685},{"IsEmpty":false,"X":53.96619,"Y":7.13404131},{"IsEmpty":false,"X":53.9345245,"Y":7.117799},{"IsEmpty":false,"X":53.93521,"Y":7.115947},{"IsEmpty":false,"X":53.9659233,"Y":7.12745953},{"IsEmpty":false,"X":54.02417,"Y":7.151306},{"IsEmpty":false,"X":54.107357,"Y":7.18645954},{"IsEmpty":false,"X":54.21287,"Y":7.23190546},{"IsEmpty":false,"X":54.3381,"Y":7.286651},{"IsEmpty":false,"X":54.4805031,"Y":7.3497324},{"IsEmpty":false,"X":54.6376343,"Y":7.420221},{"IsEmpty":false,"X":54.80718,"Y":7.497228},{"IsEmpty":false,"X":54.98697,"Y":7.57991028},{"IsEmpty":false,"X":55.1750031,"Y":7.667472},{"IsEmpty":false,"X":55.36944,"Y":7.759165},{"IsEmpty":false,"X":55.56862,"Y":7.85429335},{"IsEmpty":false,"X":55.7710457,"Y":7.95221043},{"IsEmpty":false,"X":55.9753876,"Y":8.05232},{"IsEmpty":false,"X":56.1804733,"Y":8.154073},{"IsEmpty":false,"X":56.38527,"Y":8.256969},{"IsEmpty":false,"X":56.5888824,"Y":8.360555},{"IsEmpty":false,"X":56.79055,"Y":8.464417},{"IsEmpty":false,"X":56.98961,"Y":8.568187},{"IsEmpty":false,"X":57.1855125,"Y":8.671531},{"IsEmpty":false,"X":57.3778,"Y":8.774155},{"IsEmpty":false,"X":57.5660934,"Y":8.875798},{"IsEmpty":false,"X":57.75009,"Y":8.976232},{"IsEmpty":false,"X":57.929554,"Y":9.075255},{"IsEmpty":false,"X":58.1043,"Y":9.172697},{"IsEmpty":false,"X":58.2742,"Y":9.268409},{"IsEmpty":false,"X":58.4391632,"Y":9.362267},{"IsEmpty":false,"X":58.5991364,"Y":9.454165},{"IsEmpty":false,"X":58.7541046,"Y":9.54402},{"IsEmpty":false,"X":58.90407,"Y":9.631763},{"IsEmpty":false,"X":59.04908,"Y":9.717343},{"IsEmpty":false,"X":59.18917,"Y":9.800721},{"IsEmpty":false,"X":59.3244171,"Y":9.881869},{"IsEmpty":false,"X":59.4549,"Y":9.960775},{"IsEmpty":false,"X":59.5807152,"Y":10.0374317},{"IsEmpty":false,"X":59.70196,"Y":10.1118441},{"IsEmpty":false,"X":59.81875,"Y":10.1840229},{"IsEmpty":false,"X":59.9311943,"Y":10.2539854},{"IsEmpty":false,"X":60.0394135,"Y":10.3217564},{"IsEmpty":false,"X":60.14353,"Y":10.3873644},{"IsEmpty":false,"X":60.2436676,"Y":10.4508429},{"IsEmpty":false,"X":60.3399467,"Y":10.512228},{"IsEmpty":false,"X":60.43249,"Y":10.57156},{"IsEmpty":false,"X":60.5214272,"Y":10.6288815},{"IsEmpty":false,"X":60.6068764,"Y":10.6842365},{"IsEmpty":false,"X":60.6889534,"Y":10.7376709},{"IsEmpty":false,"X":60.7677879,"Y":10.7892313},{"IsEmpty":false,"X":60.8434868,"Y":10.8389683},{"IsEmpty":false,"X":60.91617,"Y":10.8869286},{"IsEmpty":false,"X":60.98594,"Y":10.9331617},{"IsEmpty":false,"X":61.0529137,"Y":10.9777184},{"IsEmpty":false,"X":61.1171951,"Y":11.0206461},{"IsEmpty":false,"X":61.1788826,"Y":11.0619946},{"IsEmpty":false,"X":61.23808,"Y":11.1018124},{"IsEmpty":false,"X":61.2948761,"Y":11.1401472},{"IsEmpty":false,"X":61.3493729,"Y":11.1770477},{"IsEmpty":false,"X":61.4016533,"Y":11.2125587},{"IsEmpty":false,"X":61.45181,"Y":11.2467279},{"IsEmpty":false,"X":61.49992,"Y":11.2795992},{"IsEmpty":false,"X":61.5460739,"Y":11.3112173},{"IsEmpty":false,"X":61.59034,"Y":11.3416252},{"IsEmpty":false,"X":61.6327972,"Y":11.3708639},{"IsEmpty":false,"X":61.6735229,"Y":11.3989744},{"IsEmpty":false,"X":61.7125778,"Y":11.4259987},{"IsEmpty":false,"X":61.7500343,"Y":11.451973},{"IsEmpty":false,"X":61.7859573,"Y":11.4769373},{"IsEmpty":false,"X":61.8204079,"Y":11.500927},{"IsEmpty":false,"X":61.853447,"Y":11.5239782},{"IsEmpty":false,"X":61.885128,"Y":11.5461245},{"IsEmpty":false,"X":61.889122,"Y":11.5983067},{"IsEmpty":false,"X":61.776535,"Y":11.7031717},{"IsEmpty":false,"X":61.5268555,"Y":11.8413162},{"IsEmpty":false,"X":61.13603,"Y":12.0108461},{"IsEmpty":false,"X":60.60026,"Y":12.2114449},{"IsEmpty":false,"X":59.9156761,"Y":12.4429073},{"IsEmpty":false,"X":59.07918,"Y":12.7046461},{"IsEmpty":false,"X":58.08979,"Y":12.9951639},{"IsEmpty":false,"X":56.95023,"Y":13.31148},{"IsEmpty":false,"X":55.6686478,"Y":13.6485929},{"IsEmpty":false,"X":54.26008,"Y":13.9991579},{"IsEmpty":false,"X":52.7471466,"Y":14.3535337},{"IsEmpty":false,"X":51.159565,"Y":14.700346},{"IsEmpty":false,"X":49.5322762,"Y":15.0275135},{"IsEmpty":false,"X":47.902504,"Y":15.32354},{"IsEmpty":false,"X":46.30648,"Y":15.5787029},{"IsEmpty":false,"X":44.7766266,"Y":15.7858772},{"IsEmpty":false,"X":43.33979,"Y":15.94084},{"IsEmpty":false,"X":42.01669,"Y":16.0421143},{"IsEmpty":false,"X":40.82221,"Y":16.0905},{"IsEmpty":false,"X":39.766346,"Y":16.0884724},{"IsEmpty":false,"X":38.8345833,"Y":16.035017},{"IsEmpty":false,"X":37.9671631,"Y":15.9024191},{"IsEmpty":false,"X":37.179512,"Y":15.6960239},{"IsEmpty":false,"X":36.4889145,"Y":15.4281673},{"IsEmpty":false,"X":35.9083366,"Y":15.1099815},{"IsEmpty":false,"X":35.447094,"Y":14.7510262},{"IsEmpty":false,"X":35.1115761,"Y":14.35913},{"IsEmpty":false,"X":34.9059639,"Y":13.9404192},{"IsEmpty":false,"X":34.83282,"Y":13.4994965},{"IsEmpty":false,"X":34.89362,"Y":13.0397234},{"IsEmpty":false,"X":35.08911,"Y":12.5635729},{"IsEmpty":false,"X":35.1365356,"Y":12.5845556}]';
+                
+                var upper_json = [RV_upper_json, RA_upper_json, LV_upper_json, LA_upper_json];
+                var bottom_json = [RV_bottom_json, RA_bottom_json, LV_bottom_json, LA_bottom_json];
+                var middle_json = [RV_middle_json, RA_middle_json, LV_middle_json, LA_middle_json];
+
+                var upper_points = {};
+                var bottom_points = {};
+                var middle_points = {};
+
+                for (var index = 1; index < 2; index++) {
+                    upper_json[index] = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":10,"Y":0.147323042},{"IsEmpty":false,"X":15,"Y":0.343973726},{"IsEmpty":false,"X":20,"Y":0.6064682},{"IsEmpty":false,"X":25,"Y":0.9568528},{"IsEmpty":false,"X":30,"Y":1.4245553},{"IsEmpty":false,"X":35,"Y":2.048857},{"IsEmpty":false,"X":40,"Y":2.88219118},{"IsEmpty":false,"X":45,"Y":3.99454784},{"IsEmpty":false,"X":50,"Y":5.47935057},{"IsEmpty":false,"X":55,"Y":7.46130466},{"IsEmpty":false,"X":60,"Y":10.1068687},{"IsEmpty":false,"X":65,"Y":13.638237},{"IsEmpty":false,"X":70,"Y":18.3520012},{"IsEmpty":false,"X":75,"Y":24.6440563},{"IsEmpty":false,"X":80,"Y":33.04286},{"IsEmpty":false,"X":85,"Y":44.2538},{"IsEmpty":false,"X":90,"Y":59.21846},{"IsEmpty":false,"X":95,"Y":79.19369},{"IsEmpty":false,"X":100,"Y":105.85714},{"IsEmpty":false,"X":105,"Y":141.448212},{"IsEmpty":false,"X":110,"Y":188.956131},{"IsEmpty":false,"X":115,"Y":252.370926},{"IsEmpty":false,"X":120,"Y":337.018677},{"IsEmpty":false,"X":125,"Y":450.008728}]';
+                    bottom_json[index] = '[{"IsEmpty":false,"X":5,"Y":0},{"IsEmpty":false,"X":1051.36658,"Y":500}]';
+                    middle_json[index] = '[{"IsEmpty":false,"X":35.1875954,"Y":12.485673},{"IsEmpty":false,"X":35.53347,"Y":11.99584},{"IsEmpty":false,"X":36.0104027,"Y":11.5106869},{"IsEmpty":false,"X":36.6126747,"Y":11.0307026},{"IsEmpty":false,"X":37.3346024,"Y":10.557744},{"IsEmpty":false,"X":38.1699753,"Y":10.0952864},{"IsEmpty":false,"X":39.15633,"Y":9.285107},{"IsEmpty":false,"X":40.40817,"Y":8.41873},{"IsEmpty":false,"X":41.8225,"Y":7.869803},{"IsEmpty":false,"X":43.3064,"Y":7.56552362},{"IsEmpty":false,"X":44.7908669,"Y":7.453822},{"IsEmpty":false,"X":46.22512,"Y":7.490946},{"IsEmpty":false,"X":47.5758247,"Y":7.63113928},{"IsEmpty":false,"X":48.82275,"Y":7.84461641},{"IsEmpty":false,"X":49.9551964,"Y":8.106119},{"IsEmpty":false,"X":50.97019,"Y":8.394502},{"IsEmpty":false,"X":51.8708076,"Y":8.692692},{"IsEmpty":false,"X":52.6645432,"Y":8.987616},{"IsEmpty":false,"X":53.36186,"Y":9.26997948},{"IsEmpty":false,"X":53.9748726,"Y":9.533894},{"IsEmpty":false,"X":54.51629,"Y":9.776374},{"IsEmpty":false,"X":54.9985161,"Y":9.996758},{"IsEmpty":false,"X":55.43306,"Y":10.1961126},{"IsEmpty":false,"X":55.8301048,"Y":10.3766632},{"IsEmpty":false,"X":56.1982956,"Y":10.541297},{"IsEmpty":false,"X":56.5446663,"Y":10.6931458},{"IsEmpty":false,"X":56.87471,"Y":10.8352709},{"IsEmpty":false,"X":57.1924934,"Y":10.9704351},{"IsEmpty":false,"X":57.5008736,"Y":11.1009665},{"IsEmpty":false,"X":57.80169,"Y":11.228694},{"IsEmpty":false,"X":58.09598,"Y":11.3549414},{"IsEmpty":false,"X":58.38421,"Y":11.4805622},{"IsEmpty":false,"X":58.66641,"Y":11.6059971},{"IsEmpty":false,"X":58.94236,"Y":11.7313585},{"IsEmpty":false,"X":59.2116928,"Y":11.8565006},{"IsEmpty":false,"X":59.4739838,"Y":11.9810991},{"IsEmpty":false,"X":59.72883,"Y":12.10472},{"IsEmpty":false,"X":59.9758644,"Y":12.2268677},{"IsEmpty":false,"X":60.2148132,"Y":12.3470335},{"IsEmpty":false,"X":60.44548,"Y":12.4647255},{"IsEmpty":false,"X":60.6677742,"Y":12.5794868},{"IsEmpty":false,"X":60.88168,"Y":12.6909122},{"IsEmpty":false,"X":61.08727,"Y":12.7986526},{"IsEmpty":false,"X":61.28468,"Y":12.9024153},{"IsEmpty":false,"X":61.4741173,"Y":13.0019627},{"IsEmpty":false,"X":61.6559334,"Y":13.0961132},{"IsEmpty":false,"X":61.8314247,"Y":13.1817064},{"IsEmpty":false,"X":62.0020332,"Y":13.2595043},{"IsEmpty":false,"X":62.1688423,"Y":13.3304367},{"IsEmpty":false,"X":62.3326263,"Y":13.3952827},{"IsEmpty":false,"X":62.49395,"Y":13.4547091},{"IsEmpty":false,"X":62.65321,"Y":13.509305},{"IsEmpty":false,"X":62.8106728,"Y":13.5596075},{"IsEmpty":false,"X":62.9665222,"Y":13.6061077},{"IsEmpty":false,"X":63.1208344,"Y":13.6492634},{"IsEmpty":false,"X":63.273632,"Y":13.6894989},{"IsEmpty":false,"X":63.42487,"Y":13.72721},{"IsEmpty":false,"X":63.57444,"Y":13.762763},{"IsEmpty":false,"X":63.7222,"Y":13.7964964},{"IsEmpty":false,"X":63.86795,"Y":13.8287239},{"IsEmpty":false,"X":64.0114746,"Y":13.8597288},{"IsEmpty":false,"X":64.1557541,"Y":13.8750982},{"IsEmpty":false,"X":64.29964,"Y":13.9007607},{"IsEmpty":false,"X":64.4398956,"Y":13.9331255},{"IsEmpty":false,"X":64.5744858,"Y":13.969574},{"IsEmpty":false,"X":64.70217,"Y":14.0082188},{"IsEmpty":false,"X":64.82231,"Y":14.0477123},{"IsEmpty":false,"X":64.9346848,"Y":14.0871153},{"IsEmpty":false,"X":65.03932,"Y":14.1257811},{"IsEmpty":false,"X":65.1364441,"Y":14.1632814},{"IsEmpty":false,"X":65.22639,"Y":14.1993465},{"IsEmpty":false,"X":65.30954,"Y":14.2338161},{"IsEmpty":false,"X":65.38634,"Y":14.266613},{"IsEmpty":false,"X":65.45722,"Y":14.2977142},{"IsEmpty":false,"X":64.97672,"Y":14.0313654},{"IsEmpty":false,"X":64.07393,"Y":13.2961836},{"IsEmpty":false,"X":63.21457,"Y":12.6201448},{"IsEmpty":false,"X":62.4067039,"Y":12.0152836},{"IsEmpty":false,"X":61.6438675,"Y":11.4703217},{"IsEmpty":false,"X":60.92093,"Y":10.9761677},{"IsEmpty":false,"X":60.2343445,"Y":10.5259914},{"IsEmpty":false,"X":59.58185,"Y":10.1146469},{"IsEmpty":false,"X":58.9622154,"Y":9.738237},{"IsEmpty":false,"X":58.37503,"Y":9.393786},{"IsEmpty":false,"X":57.8204956,"Y":9.078995},{"IsEmpty":false,"X":57.2992821,"Y":8.792062},{"IsEmpty":false,"X":56.8123627,"Y":8.531543},{"IsEmpty":false,"X":56.36088,"Y":8.296249},{"IsEmpty":false,"X":55.9460449,"Y":8.085165},{"IsEmpty":false,"X":55.56899,"Y":7.89738464},{"IsEmpty":false,"X":55.2306938,"Y":7.732066},{"IsEmpty":false,"X":54.9319077,"Y":7.588398},{"IsEmpty":false,"X":54.6730537,"Y":7.46557},{"IsEmpty":false,"X":54.4542,"Y":7.3627553},{"IsEmpty":false,"X":54.2750168,"Y":7.27910137},{"IsEmpty":false,"X":54.13477,"Y":7.21371937},{"IsEmpty":false,"X":54.0323257,"Y":7.165685},{"IsEmpty":false,"X":53.96619,"Y":7.13404131},{"IsEmpty":false,"X":53.9345245,"Y":7.117799},{"IsEmpty":false,"X":53.93521,"Y":7.115947},{"IsEmpty":false,"X":53.9659233,"Y":7.12745953},{"IsEmpty":false,"X":54.02417,"Y":7.151306},{"IsEmpty":false,"X":54.107357,"Y":7.18645954},{"IsEmpty":false,"X":54.21287,"Y":7.23190546},{"IsEmpty":false,"X":54.3381,"Y":7.286651},{"IsEmpty":false,"X":54.4805031,"Y":7.3497324},{"IsEmpty":false,"X":54.6376343,"Y":7.420221},{"IsEmpty":false,"X":54.80718,"Y":7.497228},{"IsEmpty":false,"X":54.98697,"Y":7.57991028},{"IsEmpty":false,"X":55.1750031,"Y":7.667472},{"IsEmpty":false,"X":55.36944,"Y":7.759165},{"IsEmpty":false,"X":55.56862,"Y":7.85429335},{"IsEmpty":false,"X":55.7710457,"Y":7.95221043},{"IsEmpty":false,"X":55.9753876,"Y":8.05232},{"IsEmpty":false,"X":56.1804733,"Y":8.154073},{"IsEmpty":false,"X":56.38527,"Y":8.256969},{"IsEmpty":false,"X":56.5888824,"Y":8.360555},{"IsEmpty":false,"X":56.79055,"Y":8.464417},{"IsEmpty":false,"X":56.98961,"Y":8.568187},{"IsEmpty":false,"X":57.1855125,"Y":8.671531},{"IsEmpty":false,"X":57.3778,"Y":8.774155},{"IsEmpty":false,"X":57.5660934,"Y":8.875798},{"IsEmpty":false,"X":57.75009,"Y":8.976232},{"IsEmpty":false,"X":57.929554,"Y":9.075255},{"IsEmpty":false,"X":58.1043,"Y":9.172697},{"IsEmpty":false,"X":58.2742,"Y":9.268409},{"IsEmpty":false,"X":58.4391632,"Y":9.362267},{"IsEmpty":false,"X":58.5991364,"Y":9.454165},{"IsEmpty":false,"X":58.7541046,"Y":9.54402},{"IsEmpty":false,"X":58.90407,"Y":9.631763},{"IsEmpty":false,"X":59.04908,"Y":9.717343},{"IsEmpty":false,"X":59.18917,"Y":9.800721},{"IsEmpty":false,"X":59.3244171,"Y":9.881869},{"IsEmpty":false,"X":59.4549,"Y":9.960775},{"IsEmpty":false,"X":59.5807152,"Y":10.0374317},{"IsEmpty":false,"X":59.70196,"Y":10.1118441},{"IsEmpty":false,"X":59.81875,"Y":10.1840229},{"IsEmpty":false,"X":59.9311943,"Y":10.2539854},{"IsEmpty":false,"X":60.0394135,"Y":10.3217564},{"IsEmpty":false,"X":60.14353,"Y":10.3873644},{"IsEmpty":false,"X":60.2436676,"Y":10.4508429},{"IsEmpty":false,"X":60.3399467,"Y":10.512228},{"IsEmpty":false,"X":60.43249,"Y":10.57156},{"IsEmpty":false,"X":60.5214272,"Y":10.6288815},{"IsEmpty":false,"X":60.6068764,"Y":10.6842365},{"IsEmpty":false,"X":60.6889534,"Y":10.7376709},{"IsEmpty":false,"X":60.7677879,"Y":10.7892313},{"IsEmpty":false,"X":60.8434868,"Y":10.8389683},{"IsEmpty":false,"X":60.91617,"Y":10.8869286},{"IsEmpty":false,"X":60.98594,"Y":10.9331617},{"IsEmpty":false,"X":61.0529137,"Y":10.9777184},{"IsEmpty":false,"X":61.1171951,"Y":11.0206461},{"IsEmpty":false,"X":61.1788826,"Y":11.0619946},{"IsEmpty":false,"X":61.23808,"Y":11.1018124},{"IsEmpty":false,"X":61.2948761,"Y":11.1401472},{"IsEmpty":false,"X":61.3493729,"Y":11.1770477},{"IsEmpty":false,"X":61.4016533,"Y":11.2125587},{"IsEmpty":false,"X":61.45181,"Y":11.2467279},{"IsEmpty":false,"X":61.49992,"Y":11.2795992},{"IsEmpty":false,"X":61.5460739,"Y":11.3112173},{"IsEmpty":false,"X":61.59034,"Y":11.3416252},{"IsEmpty":false,"X":61.6327972,"Y":11.3708639},{"IsEmpty":false,"X":61.6735229,"Y":11.3989744},{"IsEmpty":false,"X":61.7125778,"Y":11.4259987},{"IsEmpty":false,"X":61.7500343,"Y":11.451973},{"IsEmpty":false,"X":61.7859573,"Y":11.4769373},{"IsEmpty":false,"X":61.8204079,"Y":11.500927},{"IsEmpty":false,"X":61.853447,"Y":11.5239782},{"IsEmpty":false,"X":61.885128,"Y":11.5461245},{"IsEmpty":false,"X":61.889122,"Y":11.5983067},{"IsEmpty":false,"X":61.776535,"Y":11.7031717},{"IsEmpty":false,"X":61.5268555,"Y":11.8413162},{"IsEmpty":false,"X":61.13603,"Y":12.0108461},{"IsEmpty":false,"X":60.60026,"Y":12.2114449},{"IsEmpty":false,"X":59.9156761,"Y":12.4429073},{"IsEmpty":false,"X":59.07918,"Y":12.7046461},{"IsEmpty":false,"X":58.08979,"Y":12.9951639},{"IsEmpty":false,"X":56.95023,"Y":13.31148},{"IsEmpty":false,"X":55.6686478,"Y":13.6485929},{"IsEmpty":false,"X":54.26008,"Y":13.9991579},{"IsEmpty":false,"X":52.7471466,"Y":14.3535337},{"IsEmpty":false,"X":51.159565,"Y":14.700346},{"IsEmpty":false,"X":49.5322762,"Y":15.0275135},{"IsEmpty":false,"X":47.902504,"Y":15.32354},{"IsEmpty":false,"X":46.30648,"Y":15.5787029},{"IsEmpty":false,"X":44.7766266,"Y":15.7858772},{"IsEmpty":false,"X":43.33979,"Y":15.94084},{"IsEmpty":false,"X":42.01669,"Y":16.0421143},{"IsEmpty":false,"X":40.82221,"Y":16.0905},{"IsEmpty":false,"X":39.766346,"Y":16.0884724},{"IsEmpty":false,"X":38.8345833,"Y":16.035017},{"IsEmpty":false,"X":37.9671631,"Y":15.9024191},{"IsEmpty":false,"X":37.179512,"Y":15.6960239},{"IsEmpty":false,"X":36.4889145,"Y":15.4281673},{"IsEmpty":false,"X":35.9083366,"Y":15.1099815},{"IsEmpty":false,"X":35.447094,"Y":14.7510262},{"IsEmpty":false,"X":35.1115761,"Y":14.35913},{"IsEmpty":false,"X":34.9059639,"Y":13.9404192},{"IsEmpty":false,"X":34.83282,"Y":13.4994965},{"IsEmpty":false,"X":34.89362,"Y":13.0397234},{"IsEmpty":false,"X":35.08911,"Y":12.5635729},{"IsEmpty":false,"X":35.1365356,"Y":12.5845556}]';
+
+                    upper_points[index] = $.parseJSON(upper_json[index]);
+                    bottom_points[index] = $.parseJSON(bottom_json[index]);
+                    middle_points[index] = $.parseJSON(middle_json[index]);
+                }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////          Convert to real point          //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                function convert(point, section) {
+                    var converted_point = {};
+                    var xratio = dimension.width / virtual_dimensions[section].width;
+                    var yratio = dimension.height / virtual_dimensions[section].height;
+
+                    converted_point.X = point.X * xratio + origins[section].X;
+                    converted_point.Y = -point.Y * yratio + origins[section].Y;
+
+                    return converted_point;
+                }               
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////          Add Sections to Canvas           //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                canvas.display.register("Section", {
+                }, function (canvas) {
+                    var origin = this.origin,
+                            dimension = this.dimension;
+
+                    canvas.beginPath();
+                    canvas.fillStyle = this.fill;
+                    canvas.fillRect(origin.X, origin.Y - dimension.height, dimension.width, dimension.height);
+                    canvas.closePath();
+                });
+                var sections = {};
+                for (var index = 1; index < 2; index++) {
+                    sections[index] = canvas.display.Section({
+                        origin: origins[index],
+                        dimension: dimension,
+                        section_index: index,
+                        fill: "#000"
+                    });
+
+                    canvas.addChild(sections[index]);
+                }
+
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////            Add Matrix to Section         ///////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                canvas.display.register("Matrix", {
+                }, function (canvas) {
+                    var origin = this.origin,
+                            dimension = this.dimension,
+                            virtual_dimension = this.virtual_dimension,
+                            section_index = this.section_index;
+
+                    canvas.beginPath();
+
+                    for (var x = 0; x < virtual_dimensions[section_index].width; x = x + steps[section_index].X) {
+                        var pointTop = convert({X: x, Y: 0}, section_index);
+                        var pointBottom = convert({X: x, Y: virtual_dimensions[section_index].height}, section_index);
+                        canvas.moveTo(pointTop.X, pointTop.Y);
+                        canvas.lineTo(pointBottom.X, pointBottom.Y);
+                    }
+
+                    for (var y = 0; y < virtual_dimensions[section_index].height; y = y + steps[section_index].Y) {
+                        var pointLeft = convert({X: 0, Y: y}, section_index);
+                        var pointRight = convert({X: virtual_dimensions[section_index].width, Y: y}, section_index);
+                        canvas.moveTo(pointLeft.X, pointLeft.Y);
+                        canvas.lineTo(pointRight.X, pointRight.Y);
+                    }
+
+                    canvas.strokeStyle = this.strokeColor;
+                    canvas.lineWidth = this.strokeWidth;
+                    canvas.stroke();
+
+                    canvas.closePath();
+                });
+
+                var matrixs = {};
+                for (var index = 1; index < 2; index++) {
+                    matrixs[index] = canvas.display.Matrix({
+                        origin: origins[index],
+                        dimension: dimension,
+                        virtual_dimension: virtual_dimensions[index],
+                        step: steps[index],
+                        section_index: index,
+                        stroke: "2px #666"
+                    });
+
+                    sections[index].addChild(matrixs[index]);
+
+                    var pointCaption = convert({X: virtual_dimensions[index].width, Y: virtual_dimensions[index].height}, index);
+                    var text = canvas.display.text({
+                        x: pointCaption.X - 64,
+                        y: pointCaption.Y + 16,
+                        origin: {x: "left", y: "top"},
+                        font: "bold 24px sans-serif",
+                        text: captions[index],
+                        fill: "#fff"
+                    });
+
+                    sections[index].addChild(text, false);
+
+                    for (var x = steps[index].X; x < virtual_dimensions[index].width; x = x + steps[index].X) {
+                        var pointTop = convert({X: x, Y: 0}, index);
+                        var text = canvas.display.text({
+                            x: pointTop.X + 4,
+                            y: pointTop.Y - 20,
+                            origin: {x: "left", y: "top"},
+                            font: "bold 16px sans-serif",
+                            text: x,
+                            fill: "#fff"
+                        });
+
+                        sections[index].addChild(text, false);
+                    }
+
+                    for (var y = steps[index].Y; y <= virtual_dimensions[index].height; y = y + steps[index].Y) {
+                        var pointLeft = convert({X: 0, Y: (y - steps[index].Y / 2)}, index);
+                        var text = canvas.display.text({
+                            x: pointLeft.X + 8,
+                            y: pointLeft.Y,
+                            origin: {x: "left", y: "bottom"},
+                            font: "bold 16px sans-serif",
+                            text: y,
+                            fill: "#fff"
+                        });
+                        sections[index].addChild(text, false);
+                    }
+                }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////             Add Paths to Section          //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                canvas.display.register("Path", {
+                }, function (canvas) {
+                    var points = this.points,
+                            section_index = this.section_index;
+                    canvas.beginPath();
+                    for (var index = 0; index < points.length; index++) {
+                        var point = convert(points[index], section_index);
+
+                        if (index === 0) {
+                            canvas.moveTo(point.X, point.Y);
+                        } else {
+                            // Check if point in region or not
+                            //if ((point.X >= origins[section_index].X && point.X <= origins[section_index].X + dimension.width) && (point.Y >= origins[section_index].Y - dimension.height && point.Y <= origins[section_index].Y)) {
+                            canvas.lineTo(point.X, point.Y);
+                            //}
+                        }
+                    }
+                    canvas.strokeStyle = this.strokeColor;
+                    canvas.lineWidth = this.strokeWidth;
+                    canvas.stroke();
+
+                    canvas.closePath();
+                });
+
+                var upper_paths = {};
+                var bottom_paths = {};
+                var middle_paths = {};
+                for (var index = 1; index < 2; index++) {
+                    upper_paths[index] = canvas.display.Path({
+                        points: upper_points[index],
+                        stroke: "3px #9ACD32",
+                        type: 'upper',
+                        section_index: index
+                    });
+
+                    bottom_paths[index] = canvas.display.Path({
+                        points: bottom_points[index],
+                        stroke: "3px #9ACD32",
+                        type: 'bottom',
+                        section_index: index
+                    });
+
+                    middle_paths[index] = canvas.display.Path({
+                        points: middle_points[index],
+                        stroke: "3px #00f",
+                        type: 'middle',
+                        section_index: index
+                    });
+
+                    sections[index].addChild(upper_paths[index], false);
+                    sections[index].addChild(bottom_paths[index], false);
+                    sections[index].addChild(middle_paths[index], false);
+                }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////            Add Ball to Section            //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                var balls = {};
+                var ball_points = {};
+                for (var index = 1; index < 2; index++) {
+                    ball_points[index] = convert(middle_points[index][0], index);
+                    balls[index] = canvas.display.ellipse({
+                        x: ball_points[index].X,
+                        y: ball_points[index].Y,
+                        radius: 12,
+                        fill: "#fff"
+                    });
+                    sections[index].addChild(balls[index], false);
+                }
+                
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////          Add Time Plot to Section        ///////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                var plot_dimension = {width: canvas_size.width, 
+                    height: canvas_size.height/6-10};
+                var virtual_plot_dimensions = [{width: 10, height: 200},{width: 10, height: 200},{width: 10, height: 200}];
+                var plot_origins = [{X: 0, Y: loops_size.height + plot_dimension.height + 10},
+                    {X: 0, Y: loops_size.height + plot_dimension.height*2 + 20},
+                    {X: 0, Y: loops_size.height + plot_dimension.height*3 + 30}];
+                var plot_steps = [{X: 0.5, Y: 50},
+                    {X: 0.5, Y: 50},
+                    {X: 0.5, Y: 50}];
+                
+                function convert_plot(point, plot_index) {
+                    var converted_point = {};
+                    var xratio = plot_dimension.width / virtual_plot_dimensions[plot_index].width;
+                    var yratio = plot_dimension.height / virtual_plot_dimensions[plot_index].height;
+
+                    converted_point.X = point.X * xratio + plot_origins[plot_index].X;
+                    converted_point.Y = -point.Y * yratio + plot_origins[plot_index].Y;
+
+                    return converted_point;
+                }
+                
+                canvas.display.register("PlotMatrix", {
+                }, function (canvas) {
+                    var origin = this.origin,
+                            dimension = this.dimension,
+                            virtual_dimension = this.virtual_dimension,
+                            plot_index = this.plot_index;
+
+                    canvas.beginPath();
+                    
+                    var pointTop = convert_plot({X: 0, Y: 0}, plot_index);
+                    var pointBottom = convert_plot({X: 0, Y: virtual_dimension.height}, plot_index);
+                    canvas.moveTo(pointTop.X, pointTop.Y);
+                    canvas.lineTo(pointBottom.X, pointBottom.Y);
+                    
+                    var pointLeft = convert_plot({X: 0, Y: 0}, plot_index);
+                    var pointRight = convert_plot({X: virtual_dimension.width, Y: 0}, plot_index);
+                    canvas.moveTo(pointLeft.X, pointLeft.Y);
+                    canvas.lineTo(pointRight.X, pointRight.Y);
+                    
+                    canvas.strokeStyle = this.strokeColor;
+                    canvas.lineWidth = this.strokeWidth;
+                    canvas.stroke();
+
+                    canvas.closePath();
+                });
+                
+                var plotMatrixs= {};
+                for (var index = 0; index < 3; index++) {
+                    plotMatrixs[index] = canvas.display.PlotMatrix({
+                        origin: plot_origins[index],
+                        dimension: plot_dimension,
+                        virtual_dimension: virtual_plot_dimensions[index],
+                        plot_index: index,
+                        stroke: "2px #fff"
+                    });
+                    canvas.addChild(plotMatrixs[index]);
+                    for (var x = plot_steps[index].X; x < virtual_plot_dimensions[index].width; x = x + plot_steps[index].X) {
+                        var pointTop = convert_plot({X: x, Y: 0}, index);
+                        var text = canvas.display.text({
+                            x: pointTop.X + 4,
+                            y: pointTop.Y - 16,
+                            origin: {x: "left", y: "top"},
+                            font: "bold 16px sans-serif",
+                            text: x,
+                            fill: "#fff"
+                        });
+
+                        plotMatrixs[index].addChild(text, false);
+                    }
+
+                    for (var y = plot_steps[index].Y; y <= virtual_plot_dimensions[index].height; y = y + plot_steps[index].Y) {
+                        var pointLeft = convert_plot({X: 0, Y: (y - plot_steps[index].Y / 2)}, index);
+                        var text = canvas.display.text({
+                            x: pointLeft.X + 4,
+                            y: pointLeft.Y + 8,
+                            origin: {x: "left", y: "bottom"},
+                            font: "bold 16px sans-serif",
+                            text: y,
+                            fill: "#fff"
+                        });
+                        plotMatrixs[index].addChild(text, false);
+                    }
+                }
+                    
+                canvas.display.register("Plot", {
+                }, function (canvas) {
+                    var heights = this.heights,
+                            plot_index = this.plot_index;
+                    canvas.beginPath();
+                    for (var index = 0; index < heights.length; index++) {
+                        var point = convert_plot({X:0.05 * index, Y: heights[index]}, plot_index);
+
+                        if (index === 0) {
+                            canvas.moveTo(point.X, point.Y);
+                        } else {
+                            // Check if point in region or not
+                            //if ((point.X >= origins[section_index].X && point.X <= origins[section_index].X + dimension.width) && (point.Y >= origins[section_index].Y - dimension.height && point.Y <= origins[section_index].Y)) {
+                            canvas.lineTo(point.X, point.Y);
+                            //}
+                        }
+                    }
+                    
+                    canvas.strokeStyle = this.strokeColor;
+                    canvas.lineWidth = this.strokeWidth;
+                    canvas.stroke();
+
+                    canvas.closePath();
+                });
+                var LAV_heights = [35.1875954,35.53347,36.0104027,36.6126747,37.3346024,38.1699753,39.15633,40.40817,41.8225,43.3064,44.7908669,46.22512,47.5758247,48.82275,49.9551964,50.97019,51.8708076,52.6645432,53.36186,53.9748726,54.51629,54.9985161,55.43306,55.8301048,56.1982956,56.5446663,56.87471,57.1924934,57.5008736,57.80169,58.09598,58.38421,58.66641,58.94236,59.2116928,59.4739838,59.72883,59.9758644,60.2148132,60.44548,60.6677742,60.88168,61.08727,61.28468,61.4741173,61.6559334,61.8314247,62.0020332,62.1688423,62.3326263,62.49395,62.65321,62.8106728,62.9665222,63.1208344,63.273632,63.42487,63.57444,63.7222,63.86795,64.0114746,64.1557541,64.29964,64.4398956,64.5744858,64.70217,64.82231,64.9346848,65.03932,65.1364441,65.22639,65.30954,65.38634,65.45722,64.97672,64.07393,63.21457,62.4067039,61.6438675,60.92093,60.2343445,59.58185,58.9622154,58.37503,57.8204956,57.2992821,56.8123627,56.36088,55.9460449,55.56899,55.2306938,54.9319077,54.6730537,54.4542,54.2750168,54.13477,54.0323257,53.96619,53.9345245,53.93521,53.9659233,54.02417,54.107357,54.21287,54.3381,54.4805031,54.6376343,54.80718,54.98697,55.1750031,55.36944,55.56862,55.7710457,55.9753876,56.1804733,56.38527,56.5888824,56.79055,56.98961,57.1855125,57.3778,57.5660934,57.75009,57.929554,58.1043,58.2742,58.4391632,58.5991364,58.7541046,58.90407,59.04908,59.18917,59.3244171,59.4549,59.5807152,59.70196,59.81875,59.9311943,60.0394135,60.14353,60.2436676,60.3399467,60.43249,60.5214272,60.6068764,60.6889534,60.7677879,60.8434868,60.91617,60.98594,61.0529137,61.1171951,61.1788826,61.23808,61.2948761,61.3493729,61.4016533,61.45181,61.49992,61.5460739,61.59034,61.6327972,61.6735229,61.7125778,61.7500343,61.7859573,61.8204079,61.853447,61.885128,61.889122,61.776535,61.5268555,61.13603,60.60026,59.9156761,59.07918,58.08979,56.95023,55.6686478,54.26008,52.7471466,51.159565,49.5322762,47.902504,46.30648,44.7766266,43.33979,42.01669,40.82221,39.766346,38.8345833,37.9671631,37.179512,36.4889145,35.9083366,35.447094,35.1115761,34.9059639,34.83282,34.89362,35.08911,35.1365356];
+                var LAV = canvas.display.Plot({
+                    heights: LAV_heights,
+                    plot_index: 1,
+                    stroke: "3px #00f",
+                    caption: 'LAV'
+                });
+                canvas.addChild(LAV);
+                
+                var LVV_heights = [140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.44223,140.113022,138.869522,136.822647,134.061676,130.6808,126.778206,122.455078,117.814087,112.957344,107.983841,102.986633,98.0501862,93.248085,88.6415,84.2784042,80.19362,76.40962,72.9378357,69.780365,66.93183,64.38123,62.1137238,60.11208,58.35802,56.833168,55.51981,54.4014,53.4628944,52.69091,52.0738068,51.60165,51.26618,51.0606651,50.9798622,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,50.9783,51.5572472,52.76661,54.15618,55.6844139,57.329,59.07127,60.8948669,62.7851257,64.7287,66.71328,68.72738,70.76027,72.8018646,74.84269,76.87393,78.8874054,80.87562,82.8317947,84.7499,86.6246948,88.45173,90.2273254,91.948616,93.61345,95.22038,96.7686,98.25786,99.68841,101.060913,102.376389,103.636108,104.841583,105.994453,107.0965,108.149536,109.155434,110.116066,111.033287,111.908936,112.7448,113.54261,114.304077,115.030815,115.724396,116.38633,117.018059,117.620987,118.196426,118.745659,119.26989,119.770294,120.247971,120.703987,121.139351,121.555016,121.95192,122.330933,122.692886,123.038582,123.368782,123.6842,123.985527,124.27343,124.548523,124.811409,125.062645,125.302773,125.53231,125.75174,125.961533,126.162132,126.353951,126.5374,126.712852,126.880676,127.041222,127.194809,127.341759,127.482361,127.616913,127.745674,127.868912,127.98687,128.099777,128.20787,128.31134,128.4104,128.505264,128.596085,128.68306,128.766357,128.846115,128.922516,128.995682,129.065781,129.155212,129.335617,129.615875,129.990982,130.456223,131.007324,131.639618,132.346939,133.120377,133.947083,134.809555,135.685471,136.548828,137.372009,138.128525,138.795776,139.357,139.802017,140.126968,140.333084,140.4253,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839,140.431839];
+                var LVV = canvas.display.Plot({
+                    heights: LVV_heights,
+                    plot_index: 1,
+                    stroke: "3px #0ff",
+                    caption: 'LVV'
+                });
+                canvas.addChild(LVV);
+                
+                var AOP_heights = [62.4044228,62.22586,62.0478745,61.8704643,61.69362,61.51734,61.34162,61.1664543,60.9918327,60.8177528,60.64421,64.63763,72.5590439,80.1808243,87.40702,94.14671,100.314781,105.833755,110.638626,114.683029,117.94455,120.427856,122.164848,123.211746,123.643906,123.549255,123.021309,122.152794,121.030411,119.731033,118.3195,116.8478,115.355286,113.869835,112.409355,110.983589,109.595856,108.24472,106.925369,105.630722,104.352371,103.081169,101.8077,100.52253,99.21639,98.37599,98.07266,97.78096,97.49043,97.2008362,96.91216,96.6244,96.3375549,96.05162,95.7666,95.48248,95.19927,94.91696,94.63556,94.35505,94.07543,93.79671,93.5188751,93.2419357,92.96587,92.6907,92.4164047,92.14299,91.8704453,91.59878,91.32798,91.0580444,90.78896,90.52075,90.25338,89.98686,89.72119,89.45636,89.19237,88.9292,88.66687,88.40536,88.14468,87.88481,87.6257553,87.3675156,87.1100845,86.85346,86.59764,86.34262,86.0883942,85.83496,85.58231,85.33046,85.07939,84.8291,84.57959,84.33086,84.0829,83.83572,83.5892944,83.34364,83.0987549,82.85462,82.61125,82.36864,82.12678,81.88567,81.64532,81.4057,81.16683,80.92871,80.69132,80.45467,80.2187653,79.98359,79.74914,79.51542,79.2824249,79.05016,78.81862,78.58779,78.35769,78.1282959,77.89962,77.67166,77.4444046,77.21786,76.99202,76.7668839,76.54245,76.31872,76.09568,75.87334,75.6516953,75.43074,75.21047,74.9909,74.77201,74.5538,74.33628,74.11943,73.90327,73.6877747,73.47296,73.25882,73.04535,72.83254,72.62041,72.4089355,72.19812,71.9879761,71.77849,71.56966,71.36148,71.15395,70.94708,70.74086,70.5352859,70.33036,70.1260757,69.92244,69.71944,69.5170746,69.31535,69.1142654,68.91381,68.71398,68.51479,68.31622,68.1182861,67.92097,67.72428,67.52821,67.33277,67.1379547,66.94376,66.750206,66.5572739,66.36497,66.1732941,65.98225,65.79183,65.60204,65.41289,65.22436,65.03645,64.8491745,64.66252,64.47649,64.29108,64.1062851,63.92211,63.73855,63.5556,63.3732529,63.1915131,63.010376,62.829834,62.6498871,62.4705238,62.4347229];
+                var AOP = canvas.display.Plot({
+                    heights: AOP_heights,
+                    plot_index: 0,
+                    stroke: "3px #0ff",
+                    caption: 'AOP'
+                });
+                canvas.addChild(AOP);
+                var LVP_heights= [12.485673,11.99584,11.5106869,11.0307026,10.557744,10.0952864,9.285107,8.41873,7.869803,7.56552362,7.453822,7.490946,7.63113928,7.84461641,8.106119,8.394502,8.692692,8.987616,9.26997948,9.533894,9.776374,9.996758,10.1961126,10.3766632,10.541297,10.6931458,10.8352709,10.9704351,11.1009665,11.228694,11.3549414,11.4805622,11.6059971,11.7313585,11.8565006,11.9810991,12.10472,12.2268677,12.3470335,12.4647255,12.5794868,12.6909122,12.7986526,12.9024153,13.0019627,13.0961132,13.1817064,13.2595043,13.3304367,13.3952827,13.4547091,13.509305,13.5596075,13.6061077,13.6492634,13.6894989,13.72721,13.762763,13.7964964,13.8287239,13.8597288,13.8750982,13.9007607,13.9331255,13.969574,14.0082188,14.0477123,14.0871153,14.1257811,14.1632814,14.1993465,14.2338161,14.266613,14.2977142,14.0313654,13.2961836,12.6201448,12.0152836,11.4703217,10.9761677,10.5259914,10.1146469,9.738237,9.393786,9.078995,8.792062,8.531543,8.296249,8.085165,7.89738464,7.732066,7.588398,7.46557,7.3627553,7.27910137,7.21371937,7.165685,7.13404131,7.117799,7.115947,7.12745953,7.151306,7.18645954,7.23190546,7.286651,7.3497324,7.420221,7.497228,7.57991028,7.667472,7.759165,7.85429335,7.95221043,8.05232,8.154073,8.256969,8.360555,8.464417,8.568187,8.671531,8.774155,8.875798,8.976232,9.075255,9.172697,9.268409,9.362267,9.454165,9.54402,9.631763,9.717343,9.800721,9.881869,9.960775,10.0374317,10.1118441,10.1840229,10.2539854,10.3217564,10.3873644,10.4508429,10.512228,10.57156,10.6288815,10.6842365,10.7376709,10.7892313,10.8389683,10.8869286,10.9331617,10.9777184,11.0206461,11.0619946,11.1018124,11.1401472,11.1770477,11.2125587,11.2467279,11.2795992,11.3112173,11.3416252,11.3708639,11.3989744,11.4259987,11.451973,11.4769373,11.500927,11.5239782,11.5461245,11.5983067,11.7031717,11.8413162,12.0108461,12.2114449,12.4429073,12.7046461,12.9951639,13.31148,13.6485929,13.9991579,14.3535337,14.700346,15.0275135,15.32354,15.5787029,15.7858772,15.94084,16.0421143,16.0905,16.0884724,16.035017,15.9024191,15.6960239,15.4281673,15.1099815,14.7510262,14.35913,13.9404192,13.4994965,13.0397234,12.5635729,12.5845556];
+                var LVP = canvas.display.Plot({
+                    heights: LVP_heights,
+                    plot_index: 0,
+                    stroke: "3px #0ff",
+                    caption: 'AOP'
+                });
+                canvas.addChild(LVP);
+                
+                var LAP_heights = [12.485673,11.99584,11.5106869,11.0307026,10.557744,10.0952864,9.285107,8.41873,7.869803,7.56552362,7.453822,7.490946,7.63113928,7.84461641,8.106119,8.394502,8.692692,8.987616,9.26997948,9.533894,9.776374,9.996758,10.1961126,10.3766632,10.541297,10.6931458,10.8352709,10.9704351,11.1009665,11.228694,11.3549414,11.4805622,11.6059971,11.7313585,11.8565006,11.9810991,12.10472,12.2268677,12.3470335,12.4647255,12.5794868,12.6909122,12.7986526,12.9024153,13.0019627,13.0961132,13.1817064,13.2595043,13.3304367,13.3952827,13.4547091,13.509305,13.5596075,13.6061077,13.6492634,13.6894989,13.72721,13.762763,13.7964964,13.8287239,13.8597288,13.8750982,13.9007607,13.9331255,13.969574,14.0082188,14.0477123,14.0871153,14.1257811,14.1632814,14.1993465,14.2338161,14.266613,14.2977142,14.0313654,13.2961836,12.6201448,12.0152836,11.4703217,10.9761677,10.5259914,10.1146469,9.738237,9.393786,9.078995,8.792062,8.531543,8.296249,8.085165,7.89738464,7.732066,7.588398,7.46557,7.3627553,7.27910137,7.21371937,7.165685,7.13404131,7.117799,7.115947,7.12745953,7.151306,7.18645954,7.23190546,7.286651,7.3497324,7.420221,7.497228,7.57991028,7.667472,7.759165,7.85429335,7.95221043,8.05232,8.154073,8.256969,8.360555,8.464417,8.568187,8.671531,8.774155,8.875798,8.976232,9.075255,9.172697,9.268409,9.362267,9.454165,9.54402,9.631763,9.717343,9.800721,9.881869,9.960775,10.0374317,10.1118441,10.1840229,10.2539854,10.3217564,10.3873644,10.4508429,10.512228,10.57156,10.6288815,10.6842365,10.7376709,10.7892313,10.8389683,10.8869286,10.9331617,10.9777184,11.0206461,11.0619946,11.1018124,11.1401472,11.1770477,11.2125587,11.2467279,11.2795992,11.3112173,11.3416252,11.3708639,11.3989744,11.4259987,11.451973,11.4769373,11.500927,11.5239782,11.5461245,11.5983067,11.7031717,11.8413162,12.0108461,12.2114449,12.4429073,12.7046461,12.9951639,13.31148,13.6485929,13.9991579,14.3535337,14.700346,15.0275135,15.32354,15.5787029,15.7858772,15.94084,16.0421143,16.0905,16.0884724,16.035017,15.9024191,15.6960239,15.4281673,15.1099815,14.7510262,14.35913,13.9404192,13.4994965,13.0397234,12.5635729,12.5845556];
+                var LAP = canvas.display.Plot({
+                    heights: LAP_heights,
+                    plot_index: 0,
+                    stroke: "3px #0ff",
+                    caption: 'LAP'
+                });
+                canvas.addChild(LAP);
+                
+                var MVF_heights = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12.3528252,15.5211,17.389328,18.9360886,20.2375011,21.3273983,22.2300186,22.9636765,23.54256,23.97801,24.2794762,24.4552536,24.5130329,24.4603233,24.3047447,24.0542355,23.7171478,23.3022747,22.8187885,22.2761288,21.6838455,21.0514,20.3879757,19.7022858,19.0024033,18.2956371,17.5884418,16.8863716,16.194088,15.515378,14.8532314,14.2099113,13.5870457,12.9857244,12.4065847,11.8499031,11.3156652,10.8036318,10.3133965,9.844431,9.396119,8.967788,8.558728,8.168215,7.79551554,7.43990326,7.10066128,6.77708864,6.46850348,6.17424345,5.89366961,5.62616539,5.371136,5.1280117,4.89624262,4.67530346,4.46468925,4.263916,4.07252169,3.89006281,3.716116,3.55027652,3.39215755,3.24139023,3.097622,2.960517,2.82975483,2.70503068,2.58605361,2.472547,2.36424756,2.26090455,2.16227961,2.06814623,1.97828853,1.89250219,1.81059217,1.73237383,1.65767109,1.58631718,1.51815355,1.45302927,1.39080143,1.33133376,1.27449727,1.22016907,1.16823256,1.11857677,1.0710963,1.02569115,0.9822659,0.94073,0.9009973,0.862985969,0.8266179,1.43966675,2.65221,3.8283546,4.942382,6.003168,7.012739,7.961385,8.82525,9.565457,10.1301394,10.4607649,10.5030746,10.2206249,9.606556,8.688577,7.524595,6.19070435,4.76651049,3.32286763,1.91472614,0.5790607,0,0,0,0,0,0,0,0,0,0,0,0];
+                var MVF = canvas.display.Plot({
+                    heights: MVF_heights,
+                    plot_index: 2,
+                    stroke: "3px #0ff",
+                    caption: 'LAP'
+                });
+                canvas.addChild(MVF);
+                
+                var AOF_heights = [0,0,0,0,0,0,0,0,0,0,0,8.691334,18.943594,28.1661739,36.2919121,43.26637,49.0458946,53.6007957,56.9218521,59.0273552,59.96805,59.8283768,58.72354,56.79289,54.19087,51.0770569,47.6066628,43.92256,40.14954,36.39089,32.7272339,29.2172318,25.8995647,22.7957954,19.9135838,17.249897,14.793973,12.5298758,10.438571,8.499532,6.69190359,4.995296,3.39027715,1.858636,0.3834815,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+                var AOF = canvas.display.Plot({
+                    heights: AOF_heights,
+                    plot_index: 2,
+                    stroke: "3px #0ff",
+                    caption: 'AOF'
+                });
+                canvas.addChild(AOF);
+                
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                //////////////////////              Add Motion to Ball           //////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////
+                var inxs = [0, 0, 0, 0];
+                canvas.setLoop(function () {
+                    for (var index = 1; index < 2; index++) {
+                        inxs[index] = (inxs[index] + 1) % middle_points[index].length;
+                        var ball_point = convert(middle_points[index][inxs[index]], index);
+                        balls[index].moveTo(ball_point.X, ball_point.Y);
+                    }
+                });
+                canvas.timeline.start();
+            });
+        </script>
+    </body>
+</html>
